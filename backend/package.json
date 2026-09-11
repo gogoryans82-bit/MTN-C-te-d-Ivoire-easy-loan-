@@ -1,13 +1,12 @@
 {
   "name": "mtn-momo-ci-loans",
-  "version": "7.5.0",
+  "version": "7.6.0",
   "description": "MTN Mobile Money Côte d'Ivoire – Application de prêt",
   "private": true,
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "migrate": "node -e \"require('./backend/db').initSchema().then(()=>{console.log('Schéma créé');process.exit(0)}).catch(e=>{console.error(e);process.exit(1)})\""
+    "dev": "nodemon backend/server.js"
   },
   "dependencies": {
     "compression": "^1.7.4",
@@ -19,8 +18,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.7.0",
-    "pdfkit": "^0.15.0",
-    "pg": "^8.13.0"
+    "pdfkit": "^0.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
