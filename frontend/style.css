@@ -703,3 +703,42 @@ input[type=range]::-moz-range-thumb {
     .pin-row { gap: 6px; }
     .dash-amount { font-size: 1.5rem; }
 }
+/* ═══════════════════════════════════════════════════════════
+   v10.1 — OTP 6-box layout
+   ═══════════════════════════════════════════════════════════ */
+
+/* OTP row — 6 boxes like the PIN row */
+.otp-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.otp-box {
+    width: 48px;
+    height: 54px;
+    border: 2px solid var(--mtn-black);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--mtn-black);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.otp-box:focus {
+    border-color: var(--mtn-yellow);
+    box-shadow: 0 0 0 3px rgba(255,204,0,0.3);
+}
+
+@media (max-width: 500px) {
+    .otp-row { gap: 6px; }
+    .otp-box { width: 42px; height: 48px; font-size: 1.1rem; }
+}
+@media (max-width: 380px) {
+    .otp-row { gap: 4px; }
+    .otp-box { width: 38px; height: 44px; font-size: 1rem; }
+}
