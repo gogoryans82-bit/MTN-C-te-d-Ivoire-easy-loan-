@@ -1,6 +1,6 @@
 {
   "name": "mtn-momo-ci-loans",
-  "version": "7.6.0",
+  "version": "7.7.0",
   "description": "MTN Mobile Money Côte d'Ivoire – Application de prêt",
   "private": true,
   "main": "backend/server.js",
