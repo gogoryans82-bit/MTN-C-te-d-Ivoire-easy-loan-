@@ -16,15 +16,15 @@ Le présent contrat est conclu entre MTN Mobile Money Côte d'Ivoire
 lors de l'inscription ("l'Emprunteur").
 
 2. ÉLIGIBILITÉ
-   • Être âgé de 18 ans ou plus (vérifié par CNI)
+   • Être âgé de 18 ans ou plus
    • Détenir une Carte Nationale d'Identité (CNI) valide
    • Posséder un compte MTN Mobile Money actif
    • Fournir des informations exactes et complètes
 
 3. CONDITIONS DU PRÊT
    • Montant minimum : 25 000 F CFA
-   • Montant maximum : déterminé par le type de compte MoMo
-     (Basic / Standard / Premium)
+   • Montant maximum : selon le niveau BCEAO du compte MoMo
+     (Simplifié / Standard / Premium)
    • Taux d'intérêt : 24 % par an, composé mensuellement
    • Remboursement : mensualités fixes selon l'échéancier convenu
    • Aucun frais caché — tous les frais sont divulgués avant acceptation
